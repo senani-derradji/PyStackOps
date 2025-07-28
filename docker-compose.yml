@@ -1,0 +1,49 @@
+version : '3.8'
+services:
+   db:
+      image : mariadb:latest
+      restart : always
+      networks:
+         - backend
+      environment :
+          MARIADB_ROOT_PASSWORD : rootPASS.1212
+          MARIADB_USER : derradji
+          MARIADB_PASSWORD : PASS1212
+          MARIADB_DATABASE : crudsdb
+      ports :
+          - "3306:3306"
+      logging:
+          driver: "json-file"
+          options:
+             max-size: "5m"
+             max-file: "2"
+   webapp :
+      build : .
+      image : py-db-web-app:v1.0
+      networks:
+         - frontend
+         - backend
+      depends_on : 
+         - db
+            # condition: service_healthy
+      
+      ports:
+         - "5000:5000"
+      
+      environment:
+         DB_HOST : db
+         DB_NAME : crudsdb
+         DB_USER : derradji
+         DB_PASSWORD : PASS1212
+
+      logging:
+          driver: "json-file"
+          options:
+             max-size: "5m"
+             max-file: "2"
+      volumes:
+         - /home/sn76/Documents:/app/volume-db:ro
+networks:
+   frontend : {}
+   backend  : 
+       internal : true 
