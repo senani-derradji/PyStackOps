@@ -58,9 +58,9 @@ Access the app at: [http://localhost:5000](http://localhost:5000)
 ---
 
 
-## 🗃️ MySQL Configuration
+## 🗃️ MariaDB Configuration
 
-The MySQL service is defined inside `docker-compose.yml`:
+The MariaDB service is defined inside `docker-compose.yml`:
 
 - **Host:** `db`
 - **User:** `derradji`
