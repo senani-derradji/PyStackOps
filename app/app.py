@@ -9,6 +9,7 @@ try:
         database=os.getenv("DB_NAME", "crudsdb"),
         connect_timeout=5 )
 except pymysql.MySQLError as e: print(e)
+
 with db.cursor() as cursor:
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS messages (
@@ -30,6 +31,8 @@ def index():
 
     return render_template('form.html')
 
-
+@app.route("/app", methods=["GET"])
+def app_page():
+    return "<h1> APP PAGE 200:OK </h1>"
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

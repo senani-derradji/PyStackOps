@@ -17,8 +17,8 @@ services:
           options:
              max-size: "5m"
              max-file: "2"
-   webapp :
-      build : .
+   flask_webapp :
+      build : ./app
       image : py-db-web-app:v1.0
       networks:
          - frontend
@@ -42,7 +42,20 @@ services:
              max-size: "5m"
              max-file: "2"
       volumes:
-         - /home/sn76/Documents:/app/volume-db:ro
+         - /home/sn76/Documents:/app/v-db:ro
+   nginx :
+      image : nginx:latest
+      restart : always
+      networks:
+         - frontend
+      ports:
+         - "80:80"
+         - "443:443"
+      volumes:
+         - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+         - ./nginx/certs:/etc/nginx/certs:ro
+      depends_on:
+         - flask_webapp
 networks:
    frontend : {}
    backend  : 
