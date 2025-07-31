@@ -168,3 +168,16 @@ The MariaDB service is defined inside `docker-compose.yml`:
 - **Database:** `crudsdb`
 
 ---
+
+## 🧰 Portainer Integration
+
+This project includes **Portainer** for visual Docker management.
+
+Portainer provides a web-based GUI to manage your Docker environment easily.  
+It helps monitor containers, networks, volumes, images, and more — directly from the browser.
+
+### 🔧 How to Access Portainer
+
+After running the project using `docker-compose up -d`, open your browser and go to: http://localhost:9000
+
+---
