@@ -1,10 +1,12 @@
-# Dockerized Flask Message Logger with IP Tracking
+# Dockerized Flask Web App with MariaDB and Nginx
 
-A lightweight Flask web application that allows users to submit a message through a simple web interface. Each submitted message is:
+This project is a minimal full-stack web application with:
 
-- Saved to a MySQL database along with the user's IP address.
-- Logged using Python's `logging` module.
-- Deployed using Docker and Docker Compose.
+- 🔧 **Flask** (served via Gunicorn)
+- 🛢️ **MariaDB** (as the database)
+- 🌐 **Nginx** (as a reverse proxy and SSL terminator)
+- 🐳 **Docker Compose** for orchestration
+- 🔐 **.env** file for environment variables
 
 ---
 
@@ -26,6 +28,7 @@ Dockerized-Flask-Message-Logger-with-IP-Tracking/
 │       ├── fullchain.pem
 │       └── privkey.pem
 │
+|── .env
 ├── docker-compose.yml
 └── README.md
 
@@ -44,7 +47,7 @@ Dockerized-Flask-Message-Logger-with-IP-Tracking/
       HTTP | (5000)
            ↓
     +-------------+
-    |  Flask App  | ← logs message + IP
+    |  Flask App  | ← Gunicorn + .env
     +-------------+
            |
      TCP 3306
@@ -52,6 +55,52 @@ Dockerized-Flask-Message-Logger-with-IP-Tracking/
     +-------------+
     |  MariaDB    |
     +-------------+
+
+---
+
+## 🔐 Environment Variables (.env)
+
+We use a `.env` file to securely pass sensitive information (like database credentials) into Docker containers.
+
+### ✅ Example `.env` file:
+
+```
+# Database settings
+DB_HOST=db
+DB_NAME=mydatabase
+DB_USER=myuser
+DB_PASSWORD=securepassword
+```
+
+> ⚠️ **Never commit `.env` to GitHub**. Add `.env` to your `.gitignore`.
+
+### 🔧 In `docker-compose.yml`
+
+Docker Compose loads this `.env` file automatically.
+
+```yaml
+services:
+  flask_webapp:
+    env_file:
+      - .env
+```
+
+### 🔧 In Flask app (`app.py`)
+
+Python uses the `os` module to read environment variables:
+
+```python
+import os
+import pymysql
+
+db = pymysql.connect(
+    host=os.getenv("DB_HOST", "localhost"),
+    user=os.getenv("DB_USER", "user"),
+    password=os.getenv("DB_PASSWORD", "pass"),
+    database=os.getenv("DB_NAME", "mydb"),
+    connect_timeout=5
+)
+```
 
 ---
 
@@ -104,6 +153,7 @@ Access the app at: [https://derradji.com](derradji.com)
 1. Open your browser and go to `derradji.com`
 2. Enter a message in the form.
 3. Submit it — your message and IP will be saved to the DB.
+4. wrk -t4 -c100 -d30s https://derradji.com
 
 ---
 
