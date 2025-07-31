@@ -61,9 +61,22 @@ services:
       depends_on:
          - flask_webapp
 
+   portainer:
+      image : portainer/portainer-ce:latest
+      container_name: Portainer
+      restart : always
+      networks:
+         - frontend
+         - backend
+      ports:
+         - "9000:9000"
+      volumes:
+         - /var/run/docker.sock:/var/run/docker.sock
+         - portainer_data:/data
 networks:
    frontend : {}
    backend  : 
        internal : true 
 volumes:
    db_data : {}
+   portainer_data : {}
