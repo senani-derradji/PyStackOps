@@ -1,15 +1,18 @@
+# This is a simple Flask application that connects to a MySQL database using pymysql.
+# You Can use your WebApp here and replace the code below with your WebApp code.
+
 from flask import Flask, request, render_template, redirect
 import pymysql, os
+
 app = Flask(__name__)
 try:
     db = pymysql.connect(
         host=os.getenv("DB_HOST", "localhost"),
-        user=os.getenv("DB_USER", "derradji"),
-        password=os.getenv("DB_PASSWORD", "PASS1212"),
-        database=os.getenv("DB_NAME", "crudsdb"),
+        user=os.getenv("DB_USER", "user"),
+        password=os.getenv("DB_PASSWORD", "password"),
+        database=os.getenv("DB_NAME", "name"),
         connect_timeout=5 )
 except pymysql.MySQLError as e: print(e)
-
 with db.cursor() as cursor:
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS messages (
@@ -34,5 +37,3 @@ def index():
 @app.route("/app", methods=["GET"])
 def app_page():
     return "<h1> APP PAGE 200:OK </h1>"
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)

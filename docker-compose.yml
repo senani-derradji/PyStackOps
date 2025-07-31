@@ -6,10 +6,13 @@ services:
       networks:
          - backend
       environment :
-          MARIADB_ROOT_PASSWORD : rootPASS.1212
-          MARIADB_USER : derradji
-          MARIADB_PASSWORD : PASS1212
-          MARIADB_DATABASE : crudsdb
+          MARIADB_ROOT_PASSWORD : ${DB_ROOT_PASSWORD}
+          MARIADB_USER : ${DB_USER}
+          MARIADB_PASSWORD : ${DB_PASSWORD}
+          MARIADB_DATABASE : ${DB_NAME}
+      # healthcheck:
+      volumes:
+         - db_data:/var/lib/mysql
       ports :
           - "3306:3306"
       logging:
@@ -19,22 +22,21 @@ services:
              max-file: "2"
    flask_webapp :
       build : ./app
-      image : py-db-web-app:v1.0
+      image : py-db-web-app:v1.0.1
       networks:
          - frontend
          - backend
       depends_on : 
          - db
-            # condition: service_healthy
-      
-      ports:
-         - "5000:5000"
+            # condition: service_healthy      
+      expose:
+         - "5000"
       
       environment:
          DB_HOST : db
-         DB_NAME : crudsdb
-         DB_USER : derradji
-         DB_PASSWORD : PASS1212
+         DB_NAME : ${DB_NAME}
+         DB_USER : ${DB_USER}
+         DB_PASSWORD : ${DB_PASSWORD}
 
       logging:
           driver: "json-file"
@@ -42,10 +44,12 @@ services:
              max-size: "5m"
              max-file: "2"
       volumes:
-         - /home/sn76/Documents:/app/v-db:ro
+         - /home/sn76/Documents:/app/vlm-web-app:ro
+
    nginx :
       image : nginx:latest
       restart : always
+
       networks:
          - frontend
       ports:
@@ -56,7 +60,10 @@ services:
          - ./nginx/certs:/etc/nginx/certs:ro
       depends_on:
          - flask_webapp
+
 networks:
    frontend : {}
    backend  : 
        internal : true 
+volumes:
+   db_data : {}
