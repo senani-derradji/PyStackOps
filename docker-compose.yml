@@ -1,5 +1,7 @@
 version : '3.8'
+
 services:
+
    db:
       image : mariadb:latest
       restart : always
@@ -11,45 +13,52 @@ services:
           MARIADB_PASSWORD : ${DB_PASSWORD}
           MARIADB_DATABASE : ${DB_NAME}
       # healthcheck:
+      #    test : ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      #    interval : 30s
+      #    timeout : 10s
+      #    retries : 5
+      #    start_period : 30s
       volumes:
          - db_data:/var/lib/mysql
       ports :
           - "3306:3306"
+   
       logging:
           driver: "json-file"
           options:
              max-size: "5m"
              max-file: "2"
-   flask_webapp :
+
+   backend_webapp :
       build : ./app
       image : py-db-web-app:v1.0.1
+      container_name: python_backend_app
       networks:
          - frontend
          - backend
       depends_on : 
          - db
-            # condition: service_healthy      
+            # condition: service_healthy  
+         # - redis    
       expose:
          - "5000"
-      
       environment:
+         # REDIS_HOST: redis
          DB_HOST : db
          DB_NAME : ${DB_NAME}
          DB_USER : ${DB_USER}
          DB_PASSWORD : ${DB_PASSWORD}
-
       logging:
           driver: "json-file"
           options:
              max-size: "5m"
              max-file: "2"
       volumes:
-         - /home/sn76/Documents:/app/vlm-web-app:ro
+         - /home:/app/vlm-web-app:ro
 
    nginx :
       image : nginx:latest
       restart : always
-
       networks:
          - frontend
       ports:
@@ -58,8 +67,20 @@ services:
       volumes:
          - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
          - ./nginx/certs:/etc/nginx/certs:ro
+         - nginx_cache:/var/cache/nginx/my_cache:rw
       depends_on:
-         - flask_webapp
+         - backend_webapp
+
+
+   # redis:
+   #    image : redis:latest
+   #    restart : always
+   #    networks:
+   #       - backend
+   #    ports:
+   #       - "6379:6379"
+   #    volumes:
+   #       - redis_data:/data
 
    portainer:
       image : portainer/portainer-ce:latest
@@ -69,14 +90,18 @@ services:
          - frontend
          - backend
       ports:
-         - "9000:9000"
+         - "6000:6000"
       volumes:
          - /var/run/docker.sock:/var/run/docker.sock
          - portainer_data:/data
+
 networks:
    frontend : {}
    backend  : 
        internal : true 
+
 volumes:
    db_data : {}
    portainer_data : {}
+   redis_data : {}
+   nginx_cache : {}
