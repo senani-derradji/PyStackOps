@@ -31,7 +31,6 @@ services:
 
    backend_webapp :
       build : ./app
-      image : py-db-web-app:v1.0.1
       container_name: python_backend_app
       networks:
          - frontend
@@ -39,11 +38,11 @@ services:
       depends_on : 
          - db
             # condition: service_healthy  
-         # - redis    
+         - redis    
       expose:
          - "5000"
       environment:
-         # REDIS_HOST: redis
+         REDIS_HOST: redis
          DB_HOST : db
          DB_NAME : ${DB_NAME}
          DB_USER : ${DB_USER}
@@ -57,7 +56,8 @@ services:
          - /home:/app/vlm-web-app:ro
 
    nginx :
-      image : nginx:latest
+      build: 
+         context: ./nginx
       restart : always
       networks:
          - frontend
@@ -72,25 +72,24 @@ services:
          - backend_webapp
 
 
-   # redis:
-   #    image : redis:latest
-   #    restart : always
-   #    networks:
-   #       - backend
-   #    ports:
-   #       - "6379:6379"
-   #    volumes:
-   #       - redis_data:/data
+   redis:
+      image : redis:latest
+      restart : always
+      networks:
+         - backend
+      ports:
+         - "6379:6379"
+      volumes:
+         - redis_data:/data
 
    portainer:
       image : portainer/portainer-ce:latest
-      container_name: Portainer
       restart : always
       networks:
          - frontend
          - backend
       ports:
-         - "6000:6000"
+         - "9000:9000"
       volumes:
          - /var/run/docker.sock:/var/run/docker.sock
          - portainer_data:/data
