@@ -38,7 +38,35 @@ Dockerized-Flask-Message-Logger-with-IP-Tracking/
 ```
 # Arch Overview 
 
-<img width="1024" height="1536" alt="a03e8c15-9bf9-470a-81da-b290d79f4e77" src="https://ik.imagekit.io/emfhb8pe6/ChatGPT%20Image%20Aug%202,%202025,%2012_50_06%20AM.png" />
+```
+ +------------+
+ |   Client   |
+ +------------+
+       |
+ HTTPS | TLS (443)
+       ↓
++-------------+
+|   Nginx     | ← handles HTTPS & reverse proxy & Caching
++-------------+
+       |
+  HTTP | (5000)
+       ↓
++-------------+
+|  Flask App  | ← Gunicorn + .env
++-------------+
+     |     |
+     |     | TCP 3306
+     |     ↓
+     |  +-------------+
+     |  |  MariaDB    | ← DataBase
+     |  +-------------+
+     |
+     | TCP 6379
+     ↓
++-------------+
+|   Redis     | ← Caching Layer
++-------------+
+```
 
 ---
 
