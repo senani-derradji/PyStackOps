@@ -1,0 +1,21 @@
+name : push ci-cd pipeline
+on : 
+  push:
+    branches: 
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name : checkout
+        uses: actions/Checkout@v2
+      - name : Python Set up
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      - name: Install Dependencies
+        run : |
+          pip install -r app/requirements.txt
+      - name: Run Tests
+        run: |
+          echo "Running Test .... soon"

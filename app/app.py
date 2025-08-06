@@ -1,17 +1,17 @@
 from flask import Flask, render_template, request, redirect, session, url_for
 import pymysql, redis, os
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY", "default_secret_key")
+app.secret_key = os.getenv("SECRET_KEY")
 # MariaDB Configuration
 db = pymysql.connect(
-    host=os.getenv("DB_HOST", "localhost"),
-    user=os.getenv("DB_USER", "user"),
-    password=os.getenv("DB_PASSWORD", "password"),
-    database=os.getenv("DB_NAME", "flask_db"),
+    host=os.getenv("DB_HOST", "DB"),
+    user=os.getenv("DB_USER", "USER"),
+    password=os.getenv("DB_PASSWORD", "PASSWORD"),
+    database=os.getenv("DB_NAME", "APP_DB"),
     connect_timeout=5 )
 # Redis Configuration
 redis_client = redis.Redis(
-    host=os.getenv("REDIS_HOST", "localhost"),
+    host=os.getenv("REDIS_HOST", "REDIS"),
     port=6379,
     decode_responses=True )
 # Create users table if not exists
