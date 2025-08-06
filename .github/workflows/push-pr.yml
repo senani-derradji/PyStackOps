@@ -3,6 +3,18 @@ on :
   push:
     branches: 
       - main
+    paths:
+      - 'app/requirements.txt'
+      - 'app/Dockerfile'
+      - '.github/workflows/push-pr.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'app/requirements.txt'
+      - 'app/Dockerfile'
+      - '.github/workflows/push-pr.yml'
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,6 +28,15 @@ jobs:
       - name: Install Dependencies
         run : |
           pip install -r app/requirements.txt
-      - name: Run Tests
+      - name: Run Flask App in Background
         run: |
-          echo "Running Test .... soon"
+          nohup python app/app.py &
+          sleep 20
+
+      - name: Test Flask App with curl
+        run: |
+          echo "Testing Flask App..."
+          curl -i http://127.0.0.1:5000 || echo "Failed to reach Flask app"
+
+      - name: Done
+        run: echo "CI finished ✅"
