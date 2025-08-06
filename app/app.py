@@ -1,20 +1,38 @@
 from flask import Flask, render_template, request, redirect, session, url_for
 import pymysql, redis, os
+
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
-# MariaDB Configuration
+
+# === Step 1: Create DB if not exists ===
+# Connect to MariaDB server without specifying DB
+init_conn = pymysql.connect(
+    host=os.getenv("DB_HOST", "DB"),
+    user=os.getenv("DB_USER", "USER"),
+    password=os.getenv("DB_PASSWORD", "PASSWORD"),
+    connect_timeout=5
+)
+with init_conn.cursor() as cursor:
+    cursor.execute(f"CREATE DATABASE IF NOT EXISTS {os.getenv('DB_NAME', 'APP_DB')}")
+init_conn.close()
+
+# === Step 2: Connect to the actual DB ===
 db = pymysql.connect(
     host=os.getenv("DB_HOST", "DB"),
     user=os.getenv("DB_USER", "USER"),
     password=os.getenv("DB_PASSWORD", "PASSWORD"),
     database=os.getenv("DB_NAME", "APP_DB"),
-    connect_timeout=5 )
-# Redis Configuration
+    connect_timeout=5
+)
+
+# === Step 3: Connect to Redis ===
 redis_client = redis.Redis(
     host=os.getenv("REDIS_HOST", "REDIS"),
     port=6379,
-    decode_responses=True )
-# Create users table if not exists
+    decode_responses=True
+)
+
+# === Step 4: Create users table if not exists ===
 with db.cursor() as cursor:
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
@@ -24,11 +42,13 @@ with db.cursor() as cursor:
         )
     """)
     db.commit()
+
 @app.route("/")
 def index():
     if "username" in session:
         return f"<h2>Welcome, {session['username']}!</h2><a href='/logout'>Logout</a>"
     return redirect("/login")
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
@@ -42,6 +62,7 @@ def register():
             except pymysql.err.IntegrityError:
                 return "Username already exists."
     return render_template("register.html")
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -71,4 +92,3 @@ def logout():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-
