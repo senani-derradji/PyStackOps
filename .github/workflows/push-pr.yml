@@ -4,15 +4,13 @@ on :
     branches: 
       - main
     paths:
-      - 'app/requirements.txt'
-      - 'app/Dockerfile'
+      - 'app/**'
       - '.github/workflows/push-pr.yml'
   pull_request:
     branches:
       - main
     paths:
-      - 'app/requirements.txt'
-      - 'app/Dockerfile'
+      - 'app/**'
       - '.github/workflows/push-pr.yml'
 
 jobs:
