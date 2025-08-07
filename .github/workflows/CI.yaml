@@ -1,0 +1,32 @@
+name : CI Pipeline
+
+on: 
+  workflow_dispatch:
+
+jobs :
+  CI_Job:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name : Checkout Repository
+        uses: actions/checkout@v2
+      
+      - name : Set Docker Compose
+        run : |
+          docker compose -f docker-compose.yml up -d --build
+      
+      - name : Test Flask App
+        run : |
+          docker compose exec python_backend_app pytest
+
+      - name : Logs if Failure
+        if: failure()
+        run: |
+          docker compose logs python_backend_app
+          docker compose logs db
+          docker compose logs redis
+      
+      - name : Stop and Remove Containers
+        run: |
+          docker compose down
+        

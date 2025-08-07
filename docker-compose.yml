@@ -8,10 +8,11 @@ services:
       networks:
          - backend
       environment :
-          MARIADB_ROOT_PASSWORD : ${DB_ROOT_PASSWORD}
-          MARIADB_USER : ${DB_USER}
-          MARIADB_PASSWORD : ${DB_PASSWORD}
-          MARIADB_DATABASE : ${DB_NAME}
+          MARIADB_ROOT_PASSWORD : root
+          MARIADB_USER : USER
+          MARIADB_PASSWORD : PASSWORD
+          MARIADB_HOST : DB
+          MARIADB_DATABASE : DB
       # healthcheck:
       #    test : ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       #    interval : 30s
@@ -43,10 +44,11 @@ services:
          - "5000"
       environment:
          REDIS_HOST: redis
-         DB_HOST : db
-         DB_NAME : ${DB_NAME}
-         DB_USER : ${DB_USER}
-         DB_PASSWORD : ${DB_PASSWORD}
+         DB_HOST : DB
+         DB_NAME : DB
+         DB_USER : USER
+         DB_PASSWORD : PASSWORD
+         SECRET_KEY : mysecret
       logging:
           driver: "json-file"
           options:

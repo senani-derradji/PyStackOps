@@ -1,72 +1,72 @@
-name: Flask-WebApp CI/CD
+# name: Flask-WebApp CI/CD
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
+#   pull_request:
+#     branches:
+#       - main
 
-jobs:
-  test-flask-app:
-    runs-on: ubuntu-latest
+# jobs:
+#   test-flask-app:
+#     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:5.7
-        ports:
-          - 3306:3306
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: DB
-          MYSQL_USER: USER
-          MYSQL_PASSWORD: PASSWORD
-        options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root --password=root"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
+#     services:
+#       mysql:
+#         image: mysql:5.7
+#         ports:
+#           - 3306:3306
+#         env:
+#           MYSQL_ROOT_PASSWORD: root
+#           MYSQL_DATABASE: DB
+#           MYSQL_USER: USER
+#           MYSQL_PASSWORD: PASSWORD
+#         options: >-
+#           --health-cmd="mysqladmin ping -h 127.0.0.1 -u root --password=root"
+#           --health-interval=10s
+#           --health-timeout=5s
+#           --health-retries=5
 
-      redis:
-        image: redis:latest
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd="redis-cli ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
+#       redis:
+#         image: redis:latest
+#         ports:
+#           - 6379:6379
+#         options: >-
+#           --health-cmd="redis-cli ping"
+#           --health-interval=10s
+#           --health-timeout=5s
+#           --health-retries=5
 
-    steps:
-      - name: 📥 Checkout Repository
-        uses: actions/checkout@v2
+#     steps:
+#       - name: 📥 Checkout Repository
+#         uses: actions/checkout@v2
 
-      - name: 🐍 Setup Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.9'
+#       - name: 🐍 Setup Python
+#         uses: actions/setup-python@v2
+#         with:
+#           python-version: '3.9'
 
-      - name: 📦 Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r app/requirements.txt
-          pip install pytest requests
+#       - name: 📦 Install dependencies
+#         run: |
+#           python -m pip install --upgrade pip
+#           pip install -r app/requirements.txt
+#           pip install pytest requests
 
-      - name: ⏳ Wait for MySQL and Redis
-        run: sleep 15
+#       - name: ⏳ Wait for MySQL and Redis
+#         run: sleep 10
 
-      - name: 🚀 Start Flask App in Background
-        env:
-          DB_HOST: 127.0.0.1
-          DB_USER: USER
-          DB_PASSWORD: PASSWORD
-          DB_NAME: DB
-          REDIS_HOST: 127.0.0.1
-          SECRET_KEY: mysecretkey
-        run: |
-          nohup python3 app/app.py &
-          sleep 5
+#       - name: 🚀 Start Flask App in Background
+#         env:
+#           DB_HOST: 127.0.0.1
+#           DB_USER: USER
+#           DB_PASSWORD: PASSWORD
+#           DB_NAME: DB
+#           REDIS_HOST: 127.0.0.1
+#           SECRET_KEY: mysecretkey
+#         run: |
+#           nohup python3 app/app.py &
+#           sleep 5
 
-      - name: 🧪 Run Pytest Tests
-        run: pytest app/test_app.py
+#       - name: 🧪 Run Pytest Tests
+#         run: pytest app/test_app.py
