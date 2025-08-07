@@ -40,8 +40,8 @@ services:
          - db
             # condition: service_healthy  
          - redis    
-      expose:
-         - "5000"
+      ports:
+         - "5000:5000"
       environment:
          REDIS_HOST: redis
          DB_HOST : DB
