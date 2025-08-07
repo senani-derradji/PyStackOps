@@ -26,7 +26,10 @@ jobs :
       
       - name : Test Flask App
         run : |
-          docker compose exec backend_webapp pytest app/test_app.py
+          pwd 
+          ls -la
+          sleep 10
+          docker compose exec backend_webapp python -m pytest app/test_app.py
 
       - name : Logs if Failure
         if: failure()
