@@ -22,14 +22,19 @@ jobs :
           docker compose -f docker-compose.yml up -d --build
       
       - name : Wait for Services
-        run : sleep 35
+        run : sleep 20
       
       - name : Test Flask App
         run : |
           pwd 
           ls -la
+          cd app
+          ls -al
+          cd ../nginx
+          ls -al
           sleep 10
-          docker compose exec backend_webapp python -m pytest app/test_app.py
+
+          docker compose exec backend_webapp  pytest app/test_app.py
 
       - name : Logs if Failure
         if: failure()
