@@ -16,6 +16,9 @@ jobs :
         run : |
           docker compose -f docker-compose.yml up -d --build
       
+      - name : Wait for Services
+        run : sleep 35
+      
       - name : Test Flask App
         run : |
           docker compose exec python_backend_app pytest
