@@ -1,40 +1,65 @@
-name : push ci-cd pipeline
+name : Flask-WebApp CI/CD
 on : 
   push:
-    branches: 
+    branches:
       - main
-    paths:
-      - 'app/**'
-      - '.github/workflows/push-pr.yml'
   pull_request:
     branches:
       - main
-    paths:
-      - 'app/**'
-      - '.github/workflows/push-pr.yml'
-
-jobs:
-  build:
+jobs :
+  build-flask-app:
     runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image : mysql:5.7
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: DB
+          MYSQL_USER: USER
+          MYSQL_PASSWORD: PASSWORD
+        options: >-
+          --health-cmd "mysqladmin ping -h localhost -u root --silent"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
+      
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
+    
     steps:
-      - name : checkout
-        uses: actions/Checkout@v2
-      - name : Python Set up
+      - name : Checkout Flask-WebApp
+        uses: actions/checkout@v2
+      
+      - name : Python Setup
         uses: actions/setup-python@v2
         with:
           python-version: '3.9'
-      - name: Install Dependencies
-        run : |
-          pip install -r app/requirements.txt
-      - name: Run Flask App in Background
+      
+      - name : install requirements
         run: |
-          nohup python app/app.py &
-          sleep 20
-
-      - name: Test Flask App with curl
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name : Wait for services
+        run : sleep 10
+      
+      - name : Run Flask App Tests
+        env :
+          DB_HOST: mysql
+          DB_USER: USER
+          DB_PASSWORD: PASSWORD
+          DB_NAME: DB
+          REDIS_HOST: redis
+          SECRET_KEY: mysecretkey
         run: |
-          echo "Testing Flask App..."
-          curl -i http://127.0.0.1:5000 || echo "Failed to reach Flask app"
-
-      - name: Done
-        run: echo "CI finished ✅"
+          python -m unittest discover -s tests -p "*.py"
