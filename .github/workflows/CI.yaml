@@ -1,7 +1,8 @@
 name : CI Pipeline
 
-on: 
-  workflow_dispatch:
+on : 
+  push:
+    
 
 jobs :
   CI_Job:
