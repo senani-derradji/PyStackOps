@@ -59,7 +59,8 @@ jobs :
           DB_USER: USER
           DB_PASSWORD: PASSWORD
           DB_NAME: DB
+  
           REDIS_HOST: redis
           SECRET_KEY: mysecretkey
         run: |
-          pytest app/test_app.py
+          python3 app/test_app.py
