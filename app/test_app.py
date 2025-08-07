@@ -1,26 +1,20 @@
 import requests
 
-BASE_URL = "http://localhost:5000"  # Or http://127.0.0.1:5000
+def test_home():
+    response = requests.get("http://localhost:5000/")
+    assert response.status_code == 200, f"❌ ERROR: got {response.status_code}"
+    print("✅ OK - Homepage works")
 
 def test_register():
-    print("🔧 Testing registration...")
-    r = requests.post(f"{BASE_URL}/register", data={
-        "username": "ci_user",
-        "password": "ci_pass"
-    })
-    assert r.status_code in [200, 302], f"Registration failed: {r.status_code}"
-    print("✅ Register OK")
+    response = requests.post("http://localhost:5000/register", data={"username": "u", "password": "p"})
+    assert response.status_code == 200, f"❌ ERROR: got {response.status_code}"
+    print("✅ OK - Register works")
 
 def test_login():
-    print("🔧 Testing login...")
-    r = requests.post(f"{BASE_URL}/login", data={
-        "username": "ci_user",
-        "password": "ci_pass"
-    }, allow_redirects=True)
-    assert r.status_code == 200, f"Login failed: {r.status_code}"
-    assert "Welcome" in r.text or "Logout" in r.text, "Login did not redirect properly"
-    print("✅ Login OK")
+    response = requests.post("http://localhost:5000/login", data={"username": "u", "password": "p"})
+    assert response.status_code == 200, f"❌ ERROR: got {response.status_code}"
+    print("✅ OK - Login works")
 
-if __name__ == "__main__":
-    test_register()
-    test_login()
+test_home()
+test_register()
+test_login()

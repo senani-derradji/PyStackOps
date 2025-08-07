@@ -62,4 +62,4 @@ jobs :
           REDIS_HOST: redis
           SECRET_KEY: mysecretkey
         run: |
-          python3 app/test_app.py"
+          pytest app/test_app.py
