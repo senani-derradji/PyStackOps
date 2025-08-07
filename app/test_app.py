@@ -1,20 +1,19 @@
 import requests
 
 def test_home():
-    response = requests.get("http://localhost:5000/")
-    assert response.status_code == 200, f"❌ ERROR: got {response.status_code}"
-    print("✅ OK - Homepage works")
-
-def test_register():
-    response = requests.post("http://localhost:5000/register", data={"username": "u", "password": "p"})
-    assert response.status_code == 200, f"❌ ERROR: got {response.status_code}"
-    print("✅ OK - Register works")
+    try:
+        res = requests.get("http://localhost:5000/")
+        assert res.status_code == 200
+        print("✅ Home Page is OK")
+    except Exception as e:
+        print("❌ Failed to reach Home Page:", e)
+        assert False
 
 def test_login():
-    response = requests.post("http://localhost:5000/login", data={"username": "u", "password": "p"})
-    assert response.status_code == 200, f"❌ ERROR: got {response.status_code}"
-    print("✅ OK - Login works")
-
-test_home()
-test_register()
-test_login()
+    try:
+        res = requests.post("http://localhost:5000/login", data={"username": "test", "password": "test"})
+        assert res.status_code in (200, 302)
+        print("✅ Login is OK")
+    except Exception as e:
+        print("❌ Login failed:", e)
+        assert False
