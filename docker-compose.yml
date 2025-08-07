@@ -84,17 +84,17 @@ services:
       volumes:
          - redis_data:/data
 
-   portainer:
-      image : portainer/portainer-ce:latest
-      restart : always
-      networks:
-         - frontend
-         - backend
-      ports:
-         - "9000:9000"
-      volumes:
-         - /var/run/docker.sock:/var/run/docker.sock
-         - portainer_data:/data
+   # portainer:
+   #    image : portainer/portainer-ce:latest
+   #    restart : always
+   #    networks:
+   #       - frontend
+   #       - backend
+   #    ports:
+   #       - "9000:9000"
+   #    volumes:
+   #       - /var/run/docker.sock:/var/run/docker.sock
+   #       - portainer_data:/data
 
 networks:
    frontend : {}
@@ -103,6 +103,6 @@ networks:
 
 volumes:
    db_data : {}
-   portainer_data : {}
+   # portainer_data : {}
    redis_data : {}
    nginx_cache : {}

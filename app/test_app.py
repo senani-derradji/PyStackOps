@@ -2,7 +2,7 @@ import requests
 
 def test_home():
     try:
-        res = requests.get("http://localhost:5000/")
+        res = requests.get("http://localhost:80/")
         assert res.status_code == 200
         print("✅ Home Page is OK")
     except Exception as e:
@@ -11,7 +11,7 @@ def test_home():
 
 def test_login():
     try:
-        res = requests.post("http://localhost:5000/login", data={"username": "test", "password": "test"})
+        res = requests.post("http://localhost:80/login", data={"username": "test", "password": "test"})
         assert res.status_code in (200, 302)
         print("✅ Login is OK")
     except Exception as e:
