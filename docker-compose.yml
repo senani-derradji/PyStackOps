@@ -32,7 +32,7 @@ services:
 
    backend_webapp :
       build : ./app
-      container_name: python_backend_app
+      container_name: backend_webapp
       networks:
          - frontend
          - backend
