@@ -26,15 +26,10 @@ jobs :
       
       - name : Test Flask App
         run : |
-          pwd 
-          ls -la
-          cd app
-          ls -al
-          cd ../nginx
-          ls -al
-          sleep 10
+          docker compose exec backend_webapp ls
+          sleep 5
+          docker compose exec backend_webapp pytest test_app.py
 
-          docker compose exec backend_webapp  pytest app/test_app.py
 
       - name : Logs if Failure
         if: failure()
