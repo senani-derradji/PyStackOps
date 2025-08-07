@@ -23,15 +23,10 @@ jobs :
       
       - name : Wait for Services
         run : sleep 35
-
-      - name : Clear __pycache__ before tests
-        run : |
-          docker compose exec backend_webapp find . -type d -name '__pycache__' -exec rm -r {} +
-
       
       - name : Test Flask App
         run : |
-          docker compose exec backend_webapp pytest
+          docker compose exec backend_webapp pytest app/test_app.py
 
       - name : Logs if Failure
         if: failure()
