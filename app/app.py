@@ -1,20 +1,46 @@
 from flask import Flask, render_template, request, redirect, session, url_for
 import pymysql, redis, os
+
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY")
-# MariaDB Configuration
+app.secret_key = os.getenv("SECRET_KEY", "mysecret")
+
+# Load DB credentials from env
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_USER = os.getenv("DB_USER", "USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "PASSWORD")
+DB_NAME = os.getenv("DB_NAME", "APP_DB")
+
+# Step 1: Connect to MySQL without specifying database
+conn = pymysql.connect(
+    host=DB_HOST,
+    user=DB_USER,
+    password=DB_PASSWORD,
+    connect_timeout=5
+)
+
+# Step 2: Create the database if it doesn't exist
+with conn.cursor() as cursor:
+    cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{DB_NAME}`")
+conn.commit()
+conn.close()
+
+# Step 3: Reconnect, now with database
 db = pymysql.connect(
-    host=os.getenv("DB_HOST", "DB"),
-    user=os.getenv("DB_USER", "USER"),
-    password=os.getenv("DB_PASSWORD", "PASSWORD"),
-    database=os.getenv("DB_NAME", "APP_DB"),
-    connect_timeout=5 )
+    host=DB_HOST,
+    user=DB_USER,
+    password=DB_PASSWORD,
+    database=DB_NAME,
+    connect_timeout=5
+)
+
 # Redis Configuration
 redis_client = redis.Redis(
-    host=os.getenv("REDIS_HOST", "REDIS"),
+    host=os.getenv("REDIS_HOST", "localhost"),
     port=6379,
-    decode_responses=True )
-# Create users table if not exists
+    decode_responses=True
+)
+
+# Step 4: Create users table if not exists
 with db.cursor() as cursor:
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
@@ -24,11 +50,15 @@ with db.cursor() as cursor:
         )
     """)
     db.commit()
+
+# Routes...
+
 @app.route("/")
 def index():
     if "username" in session:
         return f"<h2>Welcome, {session['username']}!</h2><a href='/logout'>Logout</a>"
     return redirect("/login")
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
@@ -42,17 +72,17 @@ def register():
             except pymysql.err.IntegrityError:
                 return "Username already exists."
     return render_template("register.html")
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
-        # check in redis first
+        # Redis cache check
         cached = redis_client.get(f"user:{username}")
         if cached and cached == password:
             session["username"] = username
             return redirect("/")
-        # check in DB
         with db.cursor() as cursor:
             cursor.execute("SELECT * FROM users WHERE username=%s AND password=%s", (username, password))
             user = cursor.fetchone()
@@ -71,4 +101,3 @@ def logout():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-
