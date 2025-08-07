@@ -63,7 +63,6 @@ jobs :
           REDIS_HOST: redis
           SECRET_KEY: mysecretkey
         run: |
-          export FLASK_APP=app/app.py
-          python3 FLASK_APP
+          python3 app/app.py
           sleep 5
           python3 app/test_app.py
