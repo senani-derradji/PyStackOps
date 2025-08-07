@@ -26,7 +26,7 @@ jobs :
       
       - name : Test Flask App
         run : |
-          docker compose exec backend_webapp sh -c "cd /app && pytest app/test_app.py"
+          docker compose exec backend_webapp pytest
 
       - name : Logs if Failure
         if: failure()
