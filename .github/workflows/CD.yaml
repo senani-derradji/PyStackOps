@@ -29,6 +29,10 @@ jobs:
 
       - name: Build Docker Image
         run: |
+          ls -al 
+          cd app
+          ls -al
+          sleep 5
           if docker build -t backend_webapp:latest .; then
             echo "::notice::Docker image built successfully."
           else
