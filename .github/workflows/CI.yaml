@@ -1,4 +1,4 @@
-name : CI Pipeline
+name : "CI Pipeline"
 
 on : 
   push:
@@ -41,4 +41,3 @@ jobs :
       - name : Stop and Remove Containers
         run: |
           docker compose down
-        
