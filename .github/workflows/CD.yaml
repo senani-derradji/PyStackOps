@@ -40,17 +40,31 @@ jobs:
             echo "::error::Backend Docker build/tag/push failed."
             exit 1
           fi
+      
+      - name : Azure Container Apps Deploy
+        run : |
+          cd app
+          ls
+          sleep 5
+          docker login ${{ secrets.AZURE_CONTAINER_LOGIN_SERVER }} -u ${{ secrets.AZURE_RIGESTERY_NAME }} -p ${{ secrets.AZURE_CONTAINER_PASSWORD }}
+          sleep 20
+          docker build -t ${{ secrets.AZURE_CONTAINER_LOGIN_SERVER }}/webappgithub:latest .
+          docker push ${{ secrets.AZURE_CONTAINER_LOGIN_SERVER }}/webappgithub:latest
+
+
+
+          
 
       # Nginx Build + Tag + Push
-      - name: Build, Tag and Push Nginx Image
-        run: |
-          cd nginx
-          ls
-          if docker build -t nginx_webapp:latest . \
-          && docker tag nginx_webapp:latest ${{ secrets.DOCKER_USERNAME }}/nginx_webapp:latest \
-          && docker push ${{ secrets.DOCKER_USERNAME }}/nginx_webapp:latest; then
-            echo "::notice::Nginx image built, tagged, and pushed successfully."
-          else
-            echo "::error::Nginx Docker build/tag/push failed."
-            exit 1
-          fi
+      # - name: Build, Tag and Push Nginx Image
+      #   run: |
+      #     cd nginx
+      #     ls
+      #     if docker build -t nginx_webapp:latest . \
+      #     && docker tag nginx_webapp:latest ${{ secrets.DOCKER_USERNAME }}/nginx_webapp:latest \
+      #     && docker push ${{ secrets.DOCKER_USERNAME }}/nginx_webapp:latest; then
+      #       echo "::notice::Nginx image built, tagged, and pushed successfully."
+      #     else
+      #       echo "::error::Nginx Docker build/tag/push failed."
+      #       exit 1
+      #     fi
