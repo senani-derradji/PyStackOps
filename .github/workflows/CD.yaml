@@ -27,62 +27,30 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Build Backend Image
-      - name: Build Backend Image
+      # Backend Build + Tag + Push
+      - name: Build, Tag and Push Backend Image
         run: |
-          if docker build -t backend_webapp:latest .; then
-            echo "::notice::Backend Docker image built successfully."
+          cd app
+          ls
+          if docker build -t backend_webapp:latest . \
+          && docker tag backend_webapp:latest ${{ secrets.DOCKER_USERNAME }}/backend_webapp:latest \
+          && docker push ${{ secrets.DOCKER_USERNAME }}/backend_webapp:latest; then
+            echo "::notice::Backend image built, tagged, and pushed successfully."
           else
-            echo "::error::Backend Docker image build failed."
+            echo "::error::Backend Docker build/tag/push failed."
             exit 1
           fi
 
-      # Build Nginx Image
-      - name: Build Nginx Image
+      # Nginx Build + Tag + Push
+      - name: Build, Tag and Push Nginx Image
         run: |
-          if docker build -t nginx_webapp:latest ./nginx; then
-            echo "::notice::Nginx Docker image built successfully."
+          cd nginx
+          ls
+          if docker build -t nginx_webapp:latest . \
+          && docker tag nginx_webapp:latest ${{ secrets.DOCKER_USERNAME }}/nginx_webapp:latest \
+          && docker push ${{ secrets.DOCKER_USERNAME }}/nginx_webapp:latest; then
+            echo "::notice::Nginx image built, tagged, and pushed successfully."
           else
-            echo "::error::Nginx Docker image build failed."
-            exit 1
-          fi
-
-      # Tag Backend Image
-      - name: Tag Backend Image
-        run: |
-          if docker tag backend_webapp:latest ${{ secrets.DOCKER_USERNAME }}/backend_webapp:latest; then
-            echo "::notice::Backend image tagged successfully."
-          else
-            echo "::error::Backend Docker tag failed."
-            exit 1
-          fi
-
-      # Tag Nginx Image
-      - name: Tag Nginx Image
-        run: |
-          if docker tag nginx_webapp:latest ${{ secrets.DOCKER_USERNAME }}/nginx_webapp:latest; then
-            echo "::notice::Nginx image tagged successfully."
-          else
-            echo "::error::Nginx Docker tag failed."
-            exit 1
-          fi
-
-      # Push Backend Image
-      - name: Push Backend Image
-        run: |
-          if docker push ${{ secrets.DOCKER_USERNAME }}/backend_webapp:latest; then
-            echo "::notice::Backend image pushed successfully."
-          else
-            echo "::error::Backend Docker push failed."
-            exit 1
-          fi
-
-      # Push Nginx Image
-      - name: Push Nginx Image
-        run: |
-          if docker push ${{ secrets.DOCKER_USERNAME }}/nginx_webapp:latest; then
-            echo "::notice::Nginx image pushed successfully."
-          else
-            echo "::error::Nginx Docker push failed."
+            echo "::error::Nginx Docker build/tag/push failed."
             exit 1
           fi
