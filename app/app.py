@@ -9,7 +9,7 @@ app.secret_key = os.getenv("SECRET_KEY", "mysecret")
 metrics = PrometheusMetrics(app)
 
 # Load DB credentials from env
-DB_HOST = os.getenv("DB_HOST", "db")
+DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_USER = os.getenv("DB_USER", "usr")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "pass")
 DB_NAME = os.getenv("DB_NAME", "db")
@@ -108,5 +108,5 @@ def logout():
     session.clear()
     return redirect("/login")
 
-# if __name__ == "__main__":
-#     app.run(host="0.0.0.0", port=5000, debug=True)
+if __name__ == "__main__":
+     app.run(host="0.0.0.0", port=5000, debug=True)

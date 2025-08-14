@@ -1,6 +1,5 @@
-import pytest
-from flask import session
 from app import app as flask_app
+import pytest
 
 # THIS IS JUST A SIMPLE TEST FILE FOR A FLASK APPLICATION
 
@@ -11,15 +10,18 @@ def client():
     with flask_app.test_client() as client:
         yield client
 
+
 def test_register_get(client):
     response = client.get("/register")
     assert response.status_code == 200
     assert b"Register" in response.data or b"register" in response.data
 
+
 def test_login_get(client):
     response = client.get("/login")
     assert response.status_code == 200
     assert b"Login" in response.data or b"login" in response.data
+
 
 def test_home_redirect_if_not_logged_in(client):
     response = client.get("/", follow_redirects=True)
