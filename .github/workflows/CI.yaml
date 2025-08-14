@@ -26,8 +26,7 @@ jobs :
       
       - name : Test Flask App
         run : |
-          docker compose exec backend_webapp ls
-          sleep 5
+          cd test & ls
           docker compose exec backend_webapp pytest test_app.py
 
 
