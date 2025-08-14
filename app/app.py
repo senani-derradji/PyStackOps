@@ -1,14 +1,18 @@
 from flask import Flask, render_template, request, redirect, session, url_for
 import pymysql, redis, os
+from prometheus_flask_exporter import PrometheusMetrics
+
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "mysecret")
 
+metrics = PrometheusMetrics(app)
+
 # Load DB credentials from env
-DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_USER = os.getenv("DB_USER", "USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "PASSWORD")
-DB_NAME = os.getenv("DB_NAME", "APP_DB")
+DB_HOST = os.getenv("DB_HOST", "db")
+DB_USER = os.getenv("DB_USER", "usr")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "pass")
+DB_NAME = os.getenv("DB_NAME", "db")
 
 # Step 1: Connect to MySQL without specifying database
 conn = pymysql.connect(
@@ -34,9 +38,14 @@ db = pymysql.connect(
 )
 
 # Redis Configuration
+redis_host = os.getenv("REDIS_HOST", "localhost")
+redis_port = int(os.getenv("REDIS_PORT", 6379))
+redis_password = os.getenv("REDIS_PASSWORD", None)
+
 redis_client = redis.Redis(
-    host=os.getenv("REDIS_HOST", "localhost"),
-    port=6379,
+    host=redis_host,
+    port=redis_port,
+    password=redis_password,
     decode_responses=True
 )
 

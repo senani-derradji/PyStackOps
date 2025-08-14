@@ -4,3 +4,4 @@ pymysql
 gunicorn
 pytest
 requests
+prometheus_flask_exporter

@@ -2,6 +2,8 @@ import pytest
 from flask import session
 from app import app as flask_app
 
+# THIS IS JUST A SIMPLE TEST FILE FOR A FLASK APPLICATION
+
 @pytest.fixture
 def client():
     flask_app.config["TESTING"] = True

@@ -30,14 +30,17 @@ jobs:
       # Backend Build + Tag + Push
       - name: Build, Tag and Push Backend Image
         run: |
-          cd app
-          ls
+          if cd app ; then
           if docker build -t backend_webapp:latest . \
           && docker tag backend_webapp:latest ${{ secrets.DOCKER_USERNAME }}/backend_webapp:latest \
           && docker push ${{ secrets.DOCKER_USERNAME }}/backend_webapp:latest; then
             echo "::notice::Backend image built, tagged, and pushed successfully."
           else
             echo "::error::Backend Docker build/tag/push failed."
+            exit 1
+          fi
+          else
+            echo "::error::Failed to change directory to app."
             exit 1
           fi
       
