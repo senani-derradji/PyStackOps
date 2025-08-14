@@ -26,7 +26,7 @@ jobs :
       
       - name : Test Flask App
         run : |
-          cd test & ls
+          cd app & ls
           docker compose exec backend_webapp pytest test_app.py
 
 
