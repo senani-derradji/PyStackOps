@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysqldb
+spec:
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+      - name: maria-db
+        image: mariadb:latest
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_USER
+          valueFrom :
+             secretKeyRef:
+               name: flask-secret 
+               key: MYSQL_USER
+
+        - name: MYSQL_DATABASE
+          valueFrom :
+             secretKeyRef:
+               name: flask-secret 
+               key: MYSQL_DATABASE
+        
+        - name: MYSQL_PASSWORD
+          valueFrom :
+             secretKeyRef:
+               name: flask-secret 
+               key: MYSQL_PASSWORD
+        
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom :
+             secretKeyRef:
+               name: flask-secret 
+               key: MYSQL_ROOT_PASSWORD
+        volumeMounts:
+          - name: mariadb-storage
+            mountPath: /var/lib/mysql
+      volumes:
+        - name: mariadb-storage
+          persistentVolumeClaim:
+            claimName: db-storage
+      
+         
+        
+

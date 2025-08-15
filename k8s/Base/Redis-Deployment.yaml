@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redisdeployment
+spec:
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:latest
+        command: ["redis-server", "--requirepass", "$(REDIS_PASSWORD)"]
+        env:
+        - name : REDIS_HOST
+          valueFrom:
+            secretKeyRef:
+              name: flask-secret
+              key : REDIS_HOST
+
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: flask-secret
+              key: REDIS_PASSWORD
+
+            
+
+
+        ports:
+        - containerPort: 6379
