@@ -1,4 +1,4 @@
-# 🚀 Python-Dockerized-Backend (Flask/Gunicorn + MariaDB + Redis + Nginx)
+# 🚀 PyStackOps (Flask/Gunicorn + MariaDB + Redis + Nginx)
 Production-ready Python backend with two deployment paths:
 
 1) 🐳 **Docker Compose** — Nginx (reverse proxy + TLS) → Flask/Gunicorn; Flask → MariaDB & Redis  
