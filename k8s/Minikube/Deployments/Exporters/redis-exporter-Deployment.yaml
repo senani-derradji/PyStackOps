@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-exporter-deployment
+spec:
+  selector:
+    matchLabels:
+      app: redis-exporter
+  template:
+    metadata:
+      labels:
+        app: redis-exporter
+    spec:
+      containers:
+      - name: redis-exporter
+        image: oliver006/redis_exporter:latest
+        args :
+          - "--redis.addr=redis:6379"
+          - "--redis.password=$(REDIS_PASSWORD)"
+        env:
+          - name : REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name : flask-secret
+                key: REDIS_PASSWORD
+
+        ports:
+        - containerPort: 9121

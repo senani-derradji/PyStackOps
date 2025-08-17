@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-deployment
+spec:
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+      - name: prometheus
+        image: prom/prometheus
+        args:
+          - "--config.file=/etc/prometheus/prometheus.yml"
+          - "--storage.tsdb.path=/prometheus"
+          - "--web.enable-lifecycle"
+          - "--web.external-url=/prometheus"
+        ports:
+        - containerPort: 9090
+        volumeMounts:
+          - name: config-prometheus-vol
+            mountPath: /etc/prometheus/
+      volumes:
+        - name: config-prometheus-vol
+          configMap:
+            name: prometheus-config
+
+

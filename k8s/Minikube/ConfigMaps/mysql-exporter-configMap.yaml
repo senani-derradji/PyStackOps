@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-exporter-config
+data:
+  my.cnf: |
+    [client]
+    user=flaskuser
+    password=dbpassword
+    host=db
+    port=3306

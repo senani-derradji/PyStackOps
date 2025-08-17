@@ -39,7 +39,7 @@ db = pymysql.connect(
 
 # Redis Configuration
 redis_host = os.getenv("REDIS_HOST", "localhost")
-redis_port = int(os.getenv("REDIS_PORT", 6379))
+redis_port = os.getenv("REDIS_PORT", 6379)
 redis_password = os.getenv("REDIS_PASSWORD", None)
 
 redis_client = redis.Redis(

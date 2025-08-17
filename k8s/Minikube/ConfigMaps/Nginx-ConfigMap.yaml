@@ -9,4 +9,8 @@ data:
         location / {
             proxy_pass http://flask-service:5000;
         }
+        location /stub_status {
+          stub_status on;
+          allow all;
+        }
     }

@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-exporter-dwployment
+spec:
+  selector:
+    matchLabels:
+      app: nginx-exporter
+  template:
+    metadata:
+      labels:
+        app: nginx-exporter
+    spec:
+      containers:
+      - name: nginx-exporter
+        image: nginx/nginx-prometheus-exporter
+        args:
+        - "-nginx.scrape-uri=http://nginx-service:80/stub_status"
+        ports:
+        - containerPort: 9113

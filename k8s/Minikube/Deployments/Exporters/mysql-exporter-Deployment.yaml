@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-exporter-deployment
+spec:
+  selector:
+    matchLabels:
+      app: mysql-exporter
+  template:
+    metadata:
+      labels:
+        app: mysql-exporter
+    spec:
+      containers:
+      - name: mysql-exporter
+        image: prom/mysqld-exporter
+        args:
+          - "--config.my-cnf=/my.cnf"   
+        ports:
+        - containerPort: 9104
+        env:
+        - name: DATA_SOURCE_NAME
+          value: "flaskuser:dbpassword@tcp(db:3306)/"
+
+        volumeMounts:
+        - name: mysql-exporter-config-vol
+          mountPath: /my.cnf
+          subPath: my.cnf 
+
+      volumes:
+      - name: mysql-exporter-config-vol
+        configMap:
+          name: mysql-exporter-config
