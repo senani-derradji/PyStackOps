@@ -122,8 +122,9 @@ jobs :
 
       - name: Destroy Kind Cluster
         run: |
+          cd k8s/Kind
+          echo "Destroying Kind cluster..."
+          ./destroy.sh
           kind delete cluster
-          kubectl config delete-cluster kind-kind
-          kubectl config unset current-context
-          kubectl config delete-context kind-kind
-          echo "::notice::Kind cluster destroyed successfully."
+          echo "::notice::Kind cluster destroyed."
+          
