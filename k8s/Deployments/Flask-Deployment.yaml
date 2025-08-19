@@ -4,7 +4,7 @@ metadata:
   name: flaskdeployment
   namespace: default
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: flask-app
@@ -19,6 +19,13 @@ spec:
         image: derradjisenani/backend_webapp:latest
         ports:
         - containerPort: 5000
+        resources:
+          requests:
+            memory: "100Mi"
+            cpu: "10m"
+          limits:
+            memory: "128Mi"
+            cpu: "15m"
 
         env:
         - name: DB_HOST

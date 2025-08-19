@@ -1,0 +1,47 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: backup-mysql
+spec:
+  schedule: "* * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backup
+            image: mariadb:10.5
+            env:
+            - name: MYSQL_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: flask-secret
+                  key: MYSQL_HOST
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: flask-secret
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: flask-secret
+                  key: MYSQL_PASSWORD
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: flask-secret
+                  key: MYSQL_DATABASE
+            command:
+            - /bin/sh
+            - -c
+            - |
+              mysqldump -h $MYSQL_HOST -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE > /backup/$MYSQL_DATABASE-$(date +\%F).sql
+            volumeMounts:
+            - name: backup-vol
+              mountPath: /backup
+          restartPolicy: OnFailure
+          volumes:
+          - name: backup-vol
+            persistentVolumeClaim:
+              claimName: backup-pvc
