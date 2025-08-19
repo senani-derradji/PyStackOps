@@ -104,14 +104,14 @@ jobs :
       
       - name: Test Flask App in Kubernetes
         run: |
-          kubectl port-forward service/flask-service 8080:5000 > /dev/null 2>&1 &
+          kubectl port-forward service/flask-service 8080:5000 &
         
           # Capture the Process ID (PID) of the background job
           PF_PID=$!
 
           # Wait a few seconds for the port-forward to establish the connection
           sleep 5
-          
+
           if curl -s http://localhost:8080; then
             echo "::notice::Flask app is running successfully in Kubernetes."
           else
