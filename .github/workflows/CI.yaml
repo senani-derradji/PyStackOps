@@ -111,8 +111,7 @@ jobs :
 
           # Wait a few seconds for the port-forward to establish the connection
           sleep 5
-
-          # sleep 3
+          
           if curl -s http://localhost:8080; then
             echo "::notice::Flask app is running successfully in Kubernetes."
           else
