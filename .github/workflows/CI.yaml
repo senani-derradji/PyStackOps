@@ -105,6 +105,7 @@ jobs :
       - name: Test Flask App in Kubernetes
         run: |
           kubectl port-forward service/flask-service 8080:5000 &
+          kubectl logs -l app=flask-app --tail=20
         
           # Capture the Process ID (PID) of the background job
           PF_PID=$!
