@@ -41,3 +41,59 @@ jobs :
       - name : Stop and Remove Containers
         run: |
           docker compose down
+      
+      - name: Install Kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          kubectl-version: 'v1.28.0' 
+
+      - name: Verify Kubectl version
+        run: kubectl version --client
+
+      - name: Install Kind
+        uses: engineerd/setup-kind@v1
+        with:
+          kind-version: 'v0.11.1'
+      
+      - name: Verify Kind version
+        run: kind version
+
+      - name: Create Kind Cluster
+        run: |
+          cd k8s/Kind
+          kind create cluster --config kind-config.yaml
+          kubectl cluster-info
+          kubectl get nodes
+      
+      - name: Apply Kubernetes Manifests
+        run: |
+          cd k8s/Kind
+          ./apply.sh
+      
+      - name: Verify Pods
+        run: |
+          kubectl wait --for=condition=ready --timeout=30s pod --all
+
+      - name: Verify Services
+        run: |
+          kubectl get services
+          kubectl get pods
+      
+      - name: Test Flask App in Kubernetes
+        run: |
+          kubectl port-forward service/flask-service 8080:5000
+          sleep 3
+          if curl -s http://localhost:8080; then
+            echo "::notice::Flask app is running successfully in Kubernetes."
+          else
+            echo "::error::Flask app is not running in Kubernetes."
+            exit 1
+          fi
+
+      - name: Destroy Kind Cluster
+        run: |
+          kind delete cluster
+          kubectl config delete-cluster kind-kind
+          kubectl config unset current-context
+          kubectl config delete-context kind-kind
+          echo "::notice::Kind cluster destroyed successfully."
