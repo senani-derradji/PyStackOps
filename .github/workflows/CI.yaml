@@ -69,6 +69,24 @@ jobs :
           kind create cluster --config Kind-Config.yaml
           kubectl cluster-info
           kubectl get nodes
+
+
+      - name: Install Local Path Provisioner
+        run: |
+          # Apply the manifest that installs the StorageClass and all necessary resources
+          kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.24/deploy/local-path-storage.yaml
+        
+          # Set it as the default storage class (optional but often useful)
+          kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+        
+          # Wait for the provisioner pod to be ready
+          kubectl rollout status deployment/local-path-provisioner -n local-path-storage --timeout=90s
+
+      - name: Verify Cluster Access
+        run: |
+          kubectl get nodes
+          echo "=== Available Storage Classes ==="
+          kubectl get storageclass # You should see 'local-path' here 
       
       - name: Apply Kubernetes Manifests
         run: |
@@ -77,7 +95,7 @@ jobs :
       
       - name: Verify Pods
         run: |
-          kubectl wait --for=condition=ready --timeout=300s pod --all
+          kubectl wait --for=condition=ready --timeout=180s pod --all
 
       - name: Verify Services
         run: |

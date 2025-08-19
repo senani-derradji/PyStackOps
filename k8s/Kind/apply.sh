@@ -16,8 +16,8 @@ sleep 5
 echo "Flask"
 kubectl apply -f ..//Deployments/Flask-Deployment.yaml
 kubectl apply -f ../Services/Flask-Service.yaml
-sleep 5
-kubectl apply -f ../Autoscalers/HPA/Flask-HPA.yaml
+# sleep 5
+# kubectl apply -f ../Autoscalers/HPA/Flask-HPA.yaml
 # sleep 5
 # echo "Ingress"
 # kubectl apply -f ../Ingress/
