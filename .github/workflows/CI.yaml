@@ -61,7 +61,11 @@ jobs :
 
       - name: Create Kind Cluster
         run: |
-          cd k8s/Kind
+          ls
+          cd k8s
+          cd Kind
+          ls
+          sleep 3
           kind create cluster --config kind-config.yaml
           kubectl cluster-info
           kubectl get nodes
