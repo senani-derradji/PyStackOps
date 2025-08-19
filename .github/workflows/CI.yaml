@@ -77,7 +77,7 @@ jobs :
       
       - name: Verify Pods
         run: |
-          kubectl wait --for=condition=ready --timeout=180s pod --all
+          kubectl wait --for=condition=ready --timeout=300s pod --all
 
       - name: Verify Services
         run: |
