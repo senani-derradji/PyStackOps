@@ -37,39 +37,39 @@ apply_and_wait() {
 
 # Base configs
 log "Applying base resources (Secrets, ConfigMaps, PVCs)..."
-kubectl apply --recursive -f ../Secrets/
-kubectl apply --recursive -f ../ConfigMaps/
+kubectl apply --recursive -f ../../Secrets/
+kubectl apply --recursive -f ../../ConfigMaps/
 kubectl apply --recursive -f ../PVCs/
 success "Base resources applied."
 
 # HPA Dependencies
 log "Installing HPA dependencies..."
-(cd ../Autoscalers/HPA && ./install-dependencies.sh)
+(cd ../../Autoscalers/HPA && ./install-dependencies.sh)
 success "HPA dependencies installed."
 
 # Optional: VPA
 # log "Installing VPA dependencies..."
-# (cd ../Minikube/VPA && ./install-dependencies.sh)
+# (cd ../../Minikube/VPA && ./install-dependencies.sh)
 # success "VPA dependencies installed."
 
 # MySQL StatefulSet
-apply_and_wait "StatefulSet" ../Kind/DBs/Mysql-Statefulset.yaml
-kubectl apply -f ../Kind/DBs/Mysql-Statefulset-Service.yaml
+apply_and_wait "StatefulSet" ../../Kind/DBs/Mysql-Statefulset.yaml
+kubectl apply -f ../../Kind/DBs/Mysql-Statefulset-Service.yaml
 # Optional VPA
 # kubectl apply -f ../Minikube/VPA/Mysql-VPA.yaml
 
 # Redis
-apply_and_wait "Deployment" ../Deployments/Redis-Deployment.yaml
-kubectl apply -f ../Services/Redis-Service.yaml
+apply_and_wait "Deployment" ../../Deployments/Redis-Deployment.yaml
+kubectl apply -f ../../Services/Redis-Service.yaml
 
 # Flask + HPA
-apply_and_wait "Deployment" ../Deployments/Flask-Deployment.yaml
-kubectl apply -f ../Autoscalers/HPA/Flask-HPA.yaml
-kubectl apply -f ../Services/Flask-Service.yaml
+apply_and_wait "Deployment" ../../Deployments/Flask-Deployment.yaml
+kubectl apply -f ../../Autoscalers/HPA/Flask-HPA.yaml
+kubectl apply -f ../../Services/Flask-Service.yaml
 
 # Nginx
-apply_and_wait "Deployment" ../Deployments/Nginx-Deployment.yaml
-kubectl apply -f ../Services/Nginx-Service.yaml
+apply_and_wait "Deployment" ../../Deployments/Nginx-Deployment.yaml
+kubectl apply -f ../../Services/Nginx-Service.yaml
 
 # Traefik Ingress
 log "Applying Traefik Ingress..."
