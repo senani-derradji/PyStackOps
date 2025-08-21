@@ -32,28 +32,28 @@ delete_resource() {
 delete_resource "Ingress" ../Ingress/Traefik-Ingress.yaml
 
 # Nginx
-delete_resource "Service" ../Services/Nginx-Service.yaml
-delete_resource "Deployment" ../Deployments/Nginx-Deployment.yaml
+delete_resource "Service" ../../Services/Nginx-Service.yaml
+delete_resource "Deployment" ../../Deployments/Nginx-Deployment.yaml
 
 # Flask + HPA
-delete_resource "Service" ../Services/Flask-Service.yaml
-delete_resource "HPA" ../Autoscalers/HPA/Flask-HPA.yaml
-delete_resource "Deployment" ../Deployments/Flask-Deployment.yaml
+delete_resource "Service" ../../Services/Flask-Service.yaml
+delete_resource "HPA" ../../Autoscalers/HPA/Flask-HPA.yaml
+delete_resource "Deployment" ../../Deployments/Flask-Deployment.yaml
 
 # Redis
-delete_resource "Service" ../Services/Redis-Service.yaml
-delete_resource "Deployment" ../Deployments/Redis-Deployment.yaml
+delete_resource "Service" ../../Services/Redis-Service.yaml
+delete_resource "Deployment" ../../Deployments/Redis-Deployment.yaml
 
 # MySQL StatefulSet
-delete_resource "Service" ../Kind/DBs/Mysql-Statefulset-Service.yaml
-delete_resource "StatefulSet" ../Kind/DBs/Mysql-Statefulset.yaml
+delete_resource "Service" ../../Kind/DBs/Mysql-Statefulset-Service.yaml
+delete_resource "StatefulSet" ../../Kind/DBs/Mysql-Statefulset.yaml
 # Optional VPA
-# delete_resource "VPA" ../Minikube/VPA/Mysql-VPA.yaml
+# delete_resource "VPA" ../../Minikube/VPA/Mysql-VPA.yaml
 
 # Base configs (Secrets, ConfigMaps, PVCs)
 log "Deleting base resources..."
-kubectl delete --recursive -f ../Secrets/ --ignore-not-found=true
-kubectl delete --recursive -f ../ConfigMaps/ --ignore-not-found=true
+kubectl delete --recursive -f ../../Secrets/ --ignore-not-found=true
+kubectl delete --recursive -f ../../ConfigMaps/ --ignore-not-found=true
 kubectl delete --recursive -f ../PVCs/ --ignore-not-found=true
 success "Base resources deleted."
 
