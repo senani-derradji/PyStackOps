@@ -8,7 +8,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-  - host: derradji.net 
+  - host: # Your Domaine
     http:
       paths:
       - path: /

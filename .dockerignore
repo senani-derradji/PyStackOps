@@ -1,2 +1,4 @@
 __pycache__/
 *.pyc
+.env
+k8s/K3s/get_helm.sh

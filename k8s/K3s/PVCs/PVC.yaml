@@ -8,3 +8,4 @@ spec:
   resources:
     requests:
       storage: 50Mi
+  storageClassName: local-path  #k3s default storage class
