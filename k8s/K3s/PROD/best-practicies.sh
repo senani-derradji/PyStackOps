@@ -56,7 +56,7 @@ success "HPA dependencies installed."
 apply_and_wait "StatefulSet" ../../Kind/DBs/Mysql-Statefulset.yaml
 kubectl apply -f ../../Kind/DBs/Mysql-Statefulset-Service.yaml
 # Optional VPA
-# kubectl apply -f ../Minikube/VPA/Mysql-VPA.yaml
+# kubectl apply -f ../../Minikube/VPA/Mysql-VPA.yaml
 
 # Redis
 apply_and_wait "Deployment" ../../Deployments/Redis-Deployment.yaml
