@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: flask-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    # أضف هذه Annotation لقبول الطلبات بدون host محدد
+    traefik.ingress.kubernetes.io/default-backend: nginx-service
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: derradji.net  # القاعدة لطلبات derradji.net
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-service
+            port:
+              number: 80
+  - http:  # قاعدة default لجميع الطلبات الأخرى
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-service
+            port:
+              number: 80
