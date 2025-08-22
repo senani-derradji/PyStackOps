@@ -8,7 +8,7 @@ on:
       - completed
 
 jobs:
-  CD_JOB:
+  DEPLOY_JOB:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
@@ -30,44 +30,30 @@ jobs:
       # Backend Build + Tag + Push
       - name: Build, Tag and Push Backend Image
         run: |
-          if cd app ; then
-          if docker build -t backend_webapp:latest . \
-          && docker tag backend_webapp:latest ${{ secrets.DOCKER_USERNAME }}/backend_webapp:latest \
-          && docker push ${{ secrets.DOCKER_USERNAME }}/backend_webapp:latest; then
-            echo "::notice::Backend image built, tagged, and pushed successfully."
-          else
-            echo "::error::Backend Docker build/tag/push failed."
-            exit 1
-          fi
-          else
-            echo "::error::Failed to change directory to app."
-            exit 1
-          fi
-      
-      - name : Azure Container Apps Deploy
-        run : |
-          cd app
-          ls
-          sleep 5
-          docker login ${{ secrets.AZURE_CONTAINER_LOGIN_SERVER }} -u ${{ secrets.AZURE_RIGESTERY_NAME }} -p ${{ secrets.AZURE_CONTAINER_PASSWORD }}
-          sleep 20
-          docker build -t ${{ secrets.AZURE_CONTAINER_LOGIN_SERVER }}/webappgithub:latest .
-          docker push ${{ secrets.AZURE_CONTAINER_LOGIN_SERVER }}/webappgithub:latest
-
-
-
-          
-
-      # Nginx Build + Tag + Push
-      # - name: Build, Tag and Push Nginx Image
-      #   run: |
-      #     cd nginx
-      #     ls
-      #     if docker build -t nginx_webapp:latest . \
-      #     && docker tag nginx_webapp:latest ${{ secrets.DOCKER_USERNAME }}/nginx_webapp:latest \
-      #     && docker push ${{ secrets.DOCKER_USERNAME }}/nginx_webapp:latest; then
-      #       echo "::notice::Nginx image built, tagged, and pushed successfully."
-      #     else
-      #       echo "::error::Nginx Docker build/tag/push failed."
-      #       exit 1
-      #     fi
+          cd app/ 
+          docker build -t backend_webapp:latest .
+          docker tag backend_webapp:latest ${{ secrets.DOCKER_USERNAME }}/backend_webapp:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/backend_webapp:latest
+          docker tag backend_webapp:latest ${{ secrets.AZURE_CONTAINER_LOGIN_SERVER }}/backend_webapp:latest
+          docker push ${{ secrets.AZURE_CONTAINER_LOGIN_SERVER }}/backend_webapp:latest
+  
+  DELIVERY_JOB:
+    needs: DEPLOY_JOB
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH Delivery
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
+          script: |
+            if [ ! -d "PyStackOps" ]; then
+              git clone https://github.com/senani-derradji/PyStackOps
+            else
+              cd PyStackOps && git pull && cd ..
+            fi
+            chmod +x ./PyStackOps/k8s/K3s/PROD/*.sh
+            ./PyStackOps/k8s/K3s/PROD/install.sh
+            ./PyStackOps/k8s/K3s/PROD/best-practices.sh
