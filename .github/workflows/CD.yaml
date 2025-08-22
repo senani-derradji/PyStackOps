@@ -58,7 +58,7 @@ jobs:
             if [ ! -d "PyStackOps" ]; then
               git clone https://github.com/senani-derradji/PyStackOps
             else
-              cd PyStackOps && git pull && cd ..
+                cd PyStackOps && git fetch --all && git reset --hard origin/main && cd ..
             fi
             chmod +x ./PyStackOps/k8s/K3s/PROD/*.sh
             ./PyStackOps/k8s/K3s/PROD/install.sh
