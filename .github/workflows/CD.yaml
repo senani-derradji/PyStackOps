@@ -62,4 +62,4 @@ jobs:
             fi
             chmod +x ./PyStackOps/k8s/K3s/PROD/*.sh
             ./PyStackOps/k8s/K3s/PROD/install.sh
-            ./PyStackOps/k8s/K3s/PROD/best-practices.sh
+            ./PyStackOps/k8s/K3s/PROD/best-practicies.sh
