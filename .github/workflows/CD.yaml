@@ -31,7 +31,7 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: ${{ secrets.AZURE_CONTAINER_LOGIN_SERVER }}
-          username: ${{ secrets.AZURE_CONTAINER_USERNAME }}
+          username: ${{ secrets.AZURE_RIGESTERY_NAME }}
           password: ${{ secrets.AZURE_CONTAINER_PASSWORD }}
 
       - name: Build, Tag and Push Backend Image
