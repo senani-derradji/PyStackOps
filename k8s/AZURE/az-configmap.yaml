@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: az-configmap
+data:
+  db-host: derradjidbprod.mysql.database.azure.com
+  db-name: derradjidbprod
