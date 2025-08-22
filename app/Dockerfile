@@ -15,5 +15,5 @@ EXPOSE 5000
 # i used gunicorn with 5 workers and 3 threads because it is a good balance for handling multiple requests efficiently
 # you can adjust the number of workers and threads based on your application's needs and the resources available
 # 5 workers and 3 threads is based on my Hardware Performance 2 cores and 4GB RAM
-# "./wait-for-it.sh", "db:3306","--timeout=30", "--"
-CMD ["gunicorn", "-w", "5", "--threads", "2", "-b", "0.0.0.0:5000", "app:app"]
+# 
+CMD ["./wait-for-it.sh", "db:3306","--timeout=30", "--", "gunicorn", "-w", "5", "--threads", "2", "-b", "0.0.0.0:5000", "app:app"]
