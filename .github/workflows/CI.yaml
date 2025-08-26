@@ -1,6 +1,6 @@
 name: CI - dev
 
-on:
+on :
   push:
     branches:
       - dev
