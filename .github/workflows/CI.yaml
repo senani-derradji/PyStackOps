@@ -75,26 +75,17 @@ jobs:
           docker compose -f docker-compose.yml up -d --build
       
       - name: Wait for Services
-        run: sleep 15
+        run: sleep 10
       
       - name: Test Flask App
         run: |
           cd app
-          sleep 5
           docker compose exec backend_webapp pytest test_app.py
       
       - name: azure login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CRED }}
-      - name : Install Docker
-        run: |
-          docker --version
-          echo $ACR_NAME
-          echo $ACR_LOGIN_SERVER
-
-      - name: List Docker images
-        run: docker images
 
       - name: Push to ACR
         run: |
@@ -102,5 +93,5 @@ jobs:
              -p $(echo '${{ secrets.AZURE_CRED }}' | jq -r .clientSecret) \
              --tenant $(echo '${{ secrets.AZURE_CRED }}' | jq -r .tenantId)
           az acr login --name "$ACR_NAME"
-          docker tag backend_webapp:latest "$ACR_LOGIN_SERVER/backend_webapp:latest"
+          docker tag pystackops-backend_webapp:latest "$ACR_LOGIN_SERVER/backend_webapp:latest"
           docker push "$ACR_LOGIN_SERVER/backend_webapp:latest"
