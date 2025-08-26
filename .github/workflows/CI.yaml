@@ -1,130 +1,145 @@
-name : "CI Pipeline"
+# name : "CI Pipeline"
 
-on: 
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+# on: 
+#   push:
+#     branches:
+#       - dev
+#   pull_request:
+#     branches:
+#       - dev
     
 
-jobs :
-  CI_Job:
-    runs-on: ubuntu-latest
+# jobs :
+#   CI_Job:
+#     runs-on: ubuntu-latest
     
-    steps:
-      - name : Checkout Repository
-        uses: actions/checkout@v2
+#     steps:
+#       - name : Checkout Repository
+#         uses: actions/checkout@v2
       
-      - name : Set Docker Compose
-        run : |
-          docker compose -f docker-compose.yml up -d --build
+# # --------------------------------------------- Terraform DEV ---------------------------------------------
+
+#       - name: Set up Terraform
+#         uses: hashicorp/setup-terraform@v1
+#         with:
+#           terraform_version: 1.7.6
+
+#       - name: Terraform Init
+#         run: terraform -chdir=IAC/envs/dev init
+
+#       - name: Terraform Validate
+#         run: terraform -chdir=IAC/envs/dev validate
       
-      - name : Wait for Services
-        run : sleep 15
+#       - name: Terraform Apply
+#         run: terraform -chdir=IAC/envs/dev apply -auto-approve
+
+# # --------------------------------------------- Docker Compose ---------------------------------------------
+#       - name : Set Docker Compose
+#         run : |
+#           docker compose -f docker-compose.yml up -d --build
       
-      - name : Test Flask App
-        run : |
-          cd app
-          sleep 5
-          docker compose exec backend_webapp pytest test_app.py
-
-
-      - name : Logs if Failure
-        if: failure()
-        run: |
-          docker compose logs backend_webapp
-          docker compose logs db
-          docker compose logs redis
+#       - name : Wait for Services
+#         run : sleep 15
       
-      - name : Stop and Remove Containers
-        run: |
-          docker compose down
+#       - name : Test Flask App
+#         run : |
+#           cd app
+#           sleep 5
+#           docker compose exec backend_webapp pytest test_app.py
+
+
+#       - name : Logs if Failure
+#         if: failure()
+#         run: |
+#           docker compose logs backend_webapp
+#           docker compose logs db
+#           docker compose logs redis
       
-      - name: Install Kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          kubectl-version: 'v1.28.0' 
+#       - name : Stop and Remove Containers
+#         run: |
+#           docker compose down
 
-      - name: Verify Kubectl version
-        run: kubectl version --client
+# # --------------------------------------------- TESTING ---------------------------------------------
+#   TEST_JOB:
+#     runs-on: ubuntu-latest
+#     needs: CI_Job
+#     environment: test 
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v2
 
-      - name: Install Kind
-        run: |
-          curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
-          chmod +x ./kind
-          sudo mv ./kind /usr/local/bin/kind
-      
-      - name: Verify Kind version
-        run: kind version
-
-      - name: Create Kind Cluster
-        run: |
-          ls
-          cd k8s
-          cd Kind
-          ls
-          sleep 3
-          kind create cluster --config Kind-Config.yaml
-          kubectl cluster-info
-          kubectl get nodes
-
-
-      - name: Install Local Path Provisioner
-        run: |
-          # Apply the manifest that installs the StorageClass and all necessary resources
-          kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.24/deploy/local-path-storage.yaml
+# # --------------------------------------------- Terraform TEST ---------------------------------------------
+#       - name: Set up Terraform
+#         uses: hashicorp/setup-terraform@v1
+#         with:
+#           terraform_version: 1.7.6
         
-          # Set it as the default storage class (optional but often useful)
-          kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
-        
-          # Wait for the provisioner pod to be ready
-          kubectl rollout status deployment/local-path-provisioner -n local-path-storage --timeout=90s
+#       - name: Terraform Init
+#         run: terraform -chdir=IAC/envs/test init
 
-      - name: Verify Cluster Access
-        run: |
-          kubectl get nodes
-          echo "=== Available Storage Classes ==="
-          kubectl get storageclass # You should see 'local-path' here 
+#       - name: Terraform Validate
+#         run: terraform -chdir=IAC/envs/test validate
+
+#       - name: Terraform Apply
+#         run: terraform -chdir=IAC/envs/test apply -auto-approve
+
+# # --------------------------------------------- Kubernetes Kind ---------------------------------------------
+#       - name: Install Kubectl
+#         uses: azure/setup-kubectl@v3
+#         with:
+#           kubectl-version: 'v1.28.0' 
+
+#       - name: Verify Kubectl version
+#         run: kubectl version --client
+
+#       - name: Install Kind
+#         run: |
+#           curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
+#           chmod +x ./kind
+#           sudo mv ./kind /usr/local/bin/kind
       
-      - name: Apply Kubernetes Manifests
-        run: |
-          cd k8s/Kind
-          ./apply.sh
+#       - name: Verify Kind version
+#         run: kind version
+
+#       - name: Create Kind Cluster
+#         run: |
+#           cd k8s/Kind
+#           kind create cluster --config Kind-Config.yaml
+#           kubectl cluster-info
+#           kubectl get nodes
+
+
+#       - name: Install Local Path Provisioner
+#         run: |
+#           kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.24/deploy/local-path-storage.yaml
+#           kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+#           kubectl rollout status deployment/local-path-provisioner -n local-path-storage --timeout=90s
       
-      - name: Verify Pods
-        run: |
-          kubectl wait --for=condition=ready --timeout=180s pod --all
-
-      - name: Verify Services
-        run: |
-          kubectl get services
-          kubectl get pods
+#       - name: Apply Kubernetes Manifests
+#         run: |
+#           cd k8s/Kind
+#           ./apply.sh
       
-      - name: Test Flask App in Kubernetes
-        run: |
-          kubectl port-forward service/flask-service 8080:5000 &
-          kubectl logs -l app=flask-app --tail=20
-        
-          # Capture the Process ID (PID) of the background job
-          PF_PID=$!
+#       - name: Verify Pods
+#         run: |
+#           kubectl wait --for=condition=ready --timeout=180s pod --all
+      
+#       - name: Test Flask App in Kubernetes
+#         run: |
+#           kubectl port-forward service/flask-service 8080:5000 &
+#           sleep 5
+#           if curl -s http://localhost:8080; then
+#             echo "::notice::Flask app is running successfully in Kubernetes."
+#           else
+#             echo "::error::Flask app is not running in Kubernetes."
+#             exit 1
+#           fi
 
-          # Wait a few seconds for the port-forward to establish the connection
-          sleep 5
-
-          if curl -s http://localhost:8080; then
-            echo "::notice::Flask app is running successfully in Kubernetes."
-          else
-            echo "::error::Flask app is not running in Kubernetes."
-            exit 1
-          fi
-
-      - name: Destroy Kind Cluster
-        run: |
-          cd k8s/Kind
-          echo "Destroying Kind cluster..."
-          ./destroy.sh
-          kind delete cluster
-          echo "::notice::Kind cluster destroyed."
+#       - name: Destroy Kind Cluster
+#         run: |
+#           cd k8s/Kind
+#           echo "Destroying Kind cluster..."
+#           ./destroy.sh
+#           kind delete cluster
+#           echo "::notice::Kind cluster destroyed."
           

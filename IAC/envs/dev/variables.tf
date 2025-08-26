@@ -32,55 +32,13 @@ variable "nsg_name" {
   default = "nsg"
 }
 
-variable "public_ip_name" {
-  type    = string
-  default = "publicIP"
-}
-
-variable "nic_name" {
-  type    = string
-  default = "nic"
-}
-
-variable "vm_name" {
-  type    = string
-  default = "vm-dev"
-}
-
-variable "vm_size" {
-  type    = string
-  default = "Standard_B1s"
-}
-
-variable "admin_username" {
-  type    = string
-  default = "derradji"
-}
-
-variable "mysql_name" { type = string }
-variable "mysql_admin" { type = string }
-variable "mysql_password" { type = string }
-variable "mysql_sku_name" { type = string }
-variable "mysql_storage_gb" { type = number }
-variable "mysql_db_name" { type = string }
-
-variable "redis_name" {
+variable "acr_name" {
   type        = string
-  default     = "redis-cache"
+  default     = "acrcontainerreg"
 }
 
-variable "redis_sku_name" {
+variable "acr_sku" {
   type        = string
-  default     = "Standard"
-}
-
-variable "redis_capacity" {
-  type        = number
-  default     = 0
-}
-
-variable "redis_family" {
-  type        = string
-  default     = "C"
+  default     = "Basic"
 }
 
