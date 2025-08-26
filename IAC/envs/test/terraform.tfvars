@@ -1,0 +1,12 @@
+rg_name = "PyStackOps"
+location = "West US 2"
+vnet_name = "vnet_pystackops"
+address_space = ["192.168.0.0/24"]
+subnet_name = "subnet_pystackops_test"
+subnet_perfix = ["192.168.0.64/26"]
+nsg_name = "nsg_pystackops_test"
+public_ip_name = "publicIP_test"
+nic_name = "nic_test"
+vm_name = "vm-test"
+vm_size = "Standard_B1s"
+admin_username = "derradji"

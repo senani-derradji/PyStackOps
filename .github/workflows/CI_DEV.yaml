@@ -1,0 +1,98 @@
+name: CI_DEV
+
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  # --------------------------------------------- Terraform in Dev ---------------------------------------------
+  Terraform_dev:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+      
+      - name: Azure Login (CLI for later az commands)
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CRED }}
+
+      - name: Export ARM_* env vars for Terraform
+        run: |
+          echo "ARM_CLIENT_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .clientId)" >> $GITHUB_ENV
+          echo "ARM_CLIENT_SECRET=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .clientSecret)" >> $GITHUB_ENV
+          echo "ARM_SUBSCRIPTION_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .subscriptionId)" >> $GITHUB_ENV
+          echo "ARM_TENANT_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .tenantId)" >> $GITHUB_ENV
+
+      - name: Terraform Init
+        run: terraform -chdir=IAC/envs/dev init
+      
+      - name: Terraform Validate
+        run: terraform -chdir=IAC/envs/dev validate
+     
+      - name: Terraform Apply
+        run: terraform -chdir=IAC/envs/dev apply -auto-approve
+
+      - name: Output ACR Login Server
+        id: acr_info
+        run: |
+          echo "acr_login_server=$(terraform -chdir=IAC/envs/dev output -raw acr_login_server)" >> $GITHUB_OUTPUT
+          echo "acr_name=$(terraform -chdir=IAC/envs/dev output -raw acr_name)" >> $GITHUB_OUTPUT
+    
+    outputs:
+      acr_login_server: ${{ steps.acr_info.outputs.acr_login_server }}
+      acr_name: ${{ steps.acr_info.outputs.acr_name }}
+
+  # --------------------------------------------- Docker in Dev ---------------------------------------------
+  docker_dev:
+    needs: Terraform_dev
+    runs-on: ubuntu-latest
+    env:
+      ACR_NAME: ${{ needs.Terraform_dev.outputs.acr_name }}
+      ACR_LOGIN_SERVER: ${{ needs.Terraform_dev.outputs.acr_login_server }}
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      
+      - name: Debug outputs
+        run: |
+          echo "ACR_NAME: $ACR_NAME"
+          echo "ACR_LOGIN_SERVER: $ACR_LOGIN_SERVER"
+      
+      - name: Set Docker Compose
+        run: |
+          docker compose -f docker-compose.yml up -d --build
+      
+      - name: Wait for Services
+        run: sleep 10
+      
+      - name: Test Flask App
+        run: |
+          cd app
+          docker compose exec backend_webapp pytest test_app.py
+      
+      - name: azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CRED }}
+
+      - name: Push to ACR
+        run: |
+          az login --service-principal -u $(echo '${{ secrets.AZURE_CRED }}' | jq -r .clientId) \
+             -p $(echo '${{ secrets.AZURE_CRED }}' | jq -r .clientSecret) \
+             --tenant $(echo '${{ secrets.AZURE_CRED }}' | jq -r .tenantId)
+          az acr login --name "$ACR_NAME"
+          docker tag pystackops-backend_webapp:latest "$ACR_LOGIN_SERVER/backend_webapp:latest"
+          docker push "$ACR_LOGIN_SERVER/backend_webapp:latest"
+    # -----------------------------------------------------------------------------
