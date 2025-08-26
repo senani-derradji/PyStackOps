@@ -16,10 +16,16 @@ jobs :
     steps:
       - name : Checkout Repository
         uses: actions/checkout@v2
+      
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.7.5
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CRED }}
 
       - name: Terraform Init
         run: terraform -chdir=IAC/envs/dev init
