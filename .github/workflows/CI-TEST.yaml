@@ -10,7 +10,6 @@ on:
 
 jobs:
   test_env:
-    depends_on: CI - dev
     runs-on: ubuntu-latest
     envirement:
       name: test
