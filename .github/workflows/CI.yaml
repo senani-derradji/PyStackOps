@@ -55,58 +55,53 @@ jobs:
 
   # --------------------------------------------- Docker in Dev ---------------------------------------------
   docker_dev:
-  needs: Terraform_dev
-  runs-on: ubuntu-latest
-  env:
-    ACR_NAME: ${{ needs.Terraform_dev.outputs.acr_name }}
-    ACR_LOGIN_SERVER: ${{ needs.Terraform_dev.outputs.acr_login_server }}
-  
-  steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
+    needs: Terraform_dev
+    runs-on: ubuntu-latest
+    env:
+      ACR_NAME: ${{ needs.Terraform_dev.outputs.acr_name }}
+      ACR_LOGIN_SERVER: ${{ needs.Terraform_dev.outputs.acr_login_server }}
     
-    # Install Docker
-    - name: Set up Docker
-      uses: docker/setup-buildx-action@v2
-    
-    - name: Start Docker Daemon
-      run: |
-        sudo systemctl start docker
-        sudo systemctl status docker
-    
-    # Debug outputs
-    - name: Debug outputs
-      run: |
-        echo "ACR_NAME: $ACR_NAME"
-        echo "ACR_LOGIN_SERVER: $ACR_LOGIN_SERVER"
-    
-    # Build and test
-    - name: Set Docker Compose
-      run: |
-        docker compose -f docker-compose.yml up -d --build
-    
-    - name: Wait for Services
-      run: sleep 15
-    
-    - name: Test Flask App
-      run: |
-        cd app
-        sleep 5
-        docker compose exec backend_webapp pytest test_app.py
-    
-    # Azure login and push
-    - name: azure login
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CRED }}
-    
-    - name: Login to ACR using token (Docker-less alternative)
-      run: |
-        # Get ACR token without requiring Docker
-        token=$(az acr login --name $ACR_NAME --expose-token --output tsv --query accessToken)
-        echo $token | docker login $ACR_LOGIN_SERVER --username 00000000-0000-0000-0000-000000000000 --password-stdin
-    
-    - name: push to ACR
-      run: |
-        docker tag backend_webapp:latest $ACR_LOGIN_SERVER/backend_webapp:latest
-        docker push $ACR_LOGIN_SERVER/backend_webapp:latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      
+      - name: Debug outputs
+        run: |
+          echo "ACR_NAME: $ACR_NAME"
+          echo "ACR_LOGIN_SERVER: $ACR_LOGIN_SERVER"
+      
+      - name: Set Docker Compose
+        run: |
+          docker compose -f docker-compose.yml up -d --build
+      
+      - name: Wait for Services
+        run: sleep 15
+      
+      - name: Test Flask App
+        run: |
+          cd app
+          sleep 5
+          docker compose exec backend_webapp pytest test_app.py
+      
+      - name: azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CRED }}
+      - name : Install Docker
+        run: |
+          curl -fsSL https://get.docker.com -o get-docker.sh
+          sh get-docker.sh
+          sudo usermod -aG docker $USER
+          newgrp docker
+          docker --version
+          echo $ACR_NAME
+          echo $ACR_LOGIN_SERVER
+
+          sleep 15
+      - name: push to ACR
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az acr login --name "$ACR_NAME"
+            docker tag backend_webapp:latest "$ACR_LOGIN_SERVER/backend_webapp:latest"
+            docker push "$ACR_LOGIN_SERVER/backend_webapp:latest"
