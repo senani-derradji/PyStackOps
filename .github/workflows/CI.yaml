@@ -89,19 +89,16 @@ jobs:
           creds: ${{ secrets.AZURE_CRED }}
       - name : Install Docker
         run: |
-          curl -fsSL https://get.docker.com -o get-docker.sh
-          sh get-docker.sh
-          sudo usermod -aG docker $USER
-          newgrp docker
           docker --version
           echo $ACR_NAME
           echo $ACR_LOGIN_SERVER
 
           sleep 15
-      - name: push to ACR
-        uses: azure/CLI@v1
-        with:
-          inlineScript: |
-            az acr login --name "$ACR_NAME"
-            docker tag backend_webapp:latest "$ACR_LOGIN_SERVER/backend_webapp:latest"
-            docker push "$ACR_LOGIN_SERVER/backend_webapp:latest"
+      - name: Push to ACR
+        run: |
+          az login --service-principal -u $(echo '${{ secrets.AZURE_CRED }}' | jq -r .clientId) \
+             -p $(echo '${{ secrets.AZURE_CRED }}' | jq -r .clientSecret) \
+             --tenant $(echo '${{ secrets.AZURE_CRED }}' | jq -r .tenantId)
+          az acr login --name "$ACR_NAME"
+          docker tag backend_webapp:latest "$ACR_LOGIN_SERVER/backend_webapp:latest"
+          docker push "$ACR_LOGIN_SERVER/backend_webapp:latest"
