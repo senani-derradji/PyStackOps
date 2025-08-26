@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, session, url_for
 import pymysql, redis, os
 from prometheus_flask_exporter import PrometheusMetrics
 
-
+# Flask App and Configuration
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "mysecret")
 

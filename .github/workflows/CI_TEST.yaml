@@ -9,7 +9,7 @@ on:
 jobs:
   test_env:
     runs-on: ubuntu-latest
-    environment: test  # environment هنا يجب أن يحتوي على required reviewers
+    environment: test
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
