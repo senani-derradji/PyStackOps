@@ -9,7 +9,7 @@ on :
       - dev
 
 jobs :
-  # --------------------------------------------- Terraform in Dev ---------------------------------------------
+# --------------------------------------------- Terraform in Dev ---------------------------------------------
   Terraform_dev:
     runs-on: ubuntu-latest
     
@@ -49,7 +49,7 @@ jobs :
           echo "ACR_LOGIN_SERVER=$(terraform -chdir=IAC/envs/dev output -raw acr_login_server)" >> $GITHUB_ENV
           echo "ACR_NAME=$(terraform -chdir=IAC/envs/dev output -raw acr_name)" >> $GITHUB_ENV
 
-  # --------------------------------------------- Docker in Dev ---------------------------------------------
+# --------------------------------------------- Docker in Dev ---------------------------------------------
   docker_dev:
     needs: Terraform_dev
     runs-on: ubuntu-latest
@@ -69,7 +69,7 @@ jobs :
           cd app
           sleep 5
           docker compose exec backend_webapp pytest test_app.py
-      # --------------------------------------------- Push to AZURE ---------------------------------------------
+# --------------------------------------------- Push to AZURE ---------------------------------------------
       - name : azure login
         uses: azure/login@v1
         with:
