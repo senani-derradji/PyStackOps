@@ -1,0 +1,145 @@
+# name : "CI Pipeline"
+
+# on: 
+#   push:
+#     branches:
+#       - dev
+#   pull_request:
+#     branches:
+#       - dev
+    
+
+# jobs :
+#   CI_Job:
+#     runs-on: ubuntu-latest
+    
+#     steps:
+#       - name : Checkout Repository
+#         uses: actions/checkout@v2
+      
+# # --------------------------------------------- Terraform DEV ---------------------------------------------
+
+#       - name: Set up Terraform
+#         uses: hashicorp/setup-terraform@v1
+#         with:
+#           terraform_version: 1.7.6
+
+#       - name: Terraform Init
+#         run: terraform -chdir=IAC/envs/dev init
+
+#       - name: Terraform Validate
+#         run: terraform -chdir=IAC/envs/dev validate
+      
+#       - name: Terraform Apply
+#         run: terraform -chdir=IAC/envs/dev apply -auto-approve
+
+# # --------------------------------------------- Docker Compose ---------------------------------------------
+#       - name : Set Docker Compose
+#         run : |
+#           docker compose -f docker-compose.yml up -d --build
+      
+#       - name : Wait for Services
+#         run : sleep 15
+      
+#       - name : Test Flask App
+#         run : |
+#           cd app
+#           sleep 5
+#           docker compose exec backend_webapp pytest test_app.py
+
+
+#       - name : Logs if Failure
+#         if: failure()
+#         run: |
+#           docker compose logs backend_webapp
+#           docker compose logs db
+#           docker compose logs redis
+      
+#       - name : Stop and Remove Containers
+#         run: |
+#           docker compose down
+
+# # --------------------------------------------- TESTING ---------------------------------------------
+#   TEST_JOB:
+#     runs-on: ubuntu-latest
+#     needs: CI_Job
+#     environment: test 
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v2
+
+# # --------------------------------------------- Terraform TEST ---------------------------------------------
+#       - name: Set up Terraform
+#         uses: hashicorp/setup-terraform@v1
+#         with:
+#           terraform_version: 1.7.6
+        
+#       - name: Terraform Init
+#         run: terraform -chdir=IAC/envs/test init
+
+#       - name: Terraform Validate
+#         run: terraform -chdir=IAC/envs/test validate
+
+#       - name: Terraform Apply
+#         run: terraform -chdir=IAC/envs/test apply -auto-approve
+
+# # --------------------------------------------- Kubernetes Kind ---------------------------------------------
+#       - name: Install Kubectl
+#         uses: azure/setup-kubectl@v3
+#         with:
+#           kubectl-version: 'v1.28.0' 
+
+#       - name: Verify Kubectl version
+#         run: kubectl version --client
+
+#       - name: Install Kind
+#         run: |
+#           curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
+#           chmod +x ./kind
+#           sudo mv ./kind /usr/local/bin/kind
+      
+#       - name: Verify Kind version
+#         run: kind version
+
+#       - name: Create Kind Cluster
+#         run: |
+#           cd k8s/Kind
+#           kind create cluster --config Kind-Config.yaml
+#           kubectl cluster-info
+#           kubectl get nodes
+
+
+#       - name: Install Local Path Provisioner
+#         run: |
+#           kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.24/deploy/local-path-storage.yaml
+#           kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+#           kubectl rollout status deployment/local-path-provisioner -n local-path-storage --timeout=90s
+      
+#       - name: Apply Kubernetes Manifests
+#         run: |
+#           cd k8s/Kind
+#           ./apply.sh
+      
+#       - name: Verify Pods
+#         run: |
+#           kubectl wait --for=condition=ready --timeout=180s pod --all
+      
+#       - name: Test Flask App in Kubernetes
+#         run: |
+#           kubectl port-forward service/flask-service 8080:5000 &
+#           sleep 5
+#           if curl -s http://localhost:8080; then
+#             echo "::notice::Flask app is running successfully in Kubernetes."
+#           else
+#             echo "::error::Flask app is not running in Kubernetes."
+#             exit 1
+#           fi
+
+#       - name: Destroy Kind Cluster
+#         run: |
+#           cd k8s/Kind
+#           echo "Destroying Kind cluster..."
+#           ./destroy.sh
+#           kind delete cluster
+#           echo "::notice::Kind cluster destroyed."
+          
