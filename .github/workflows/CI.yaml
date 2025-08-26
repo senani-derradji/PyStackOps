@@ -98,7 +98,7 @@ jobs:
     # --------------------------------------------- TEST ENV ---------------------------------------------
   test_env:
     runs-on: ubuntu-latest
-    envirement:
+    environment: 
       name: test
     
     steps:
