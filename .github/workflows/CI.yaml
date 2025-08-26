@@ -93,7 +93,9 @@ jobs:
           echo $ACR_NAME
           echo $ACR_LOGIN_SERVER
 
-          sleep 15
+      - name: List Docker images
+        run: docker images
+
       - name: Push to ACR
         run: |
           az login --service-principal -u $(echo '${{ secrets.AZURE_CRED }}' | jq -r .clientId) \
