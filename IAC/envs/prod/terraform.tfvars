@@ -1,0 +1,11 @@
+rg_name = "PyStackOps-Prod"
+location = "West US 2"
+vnet_name = "vnet_pystackops"
+address_space = ["192.168.0.0/24"]
+subnet_name = "subnet_pystackops_prod"
+subnet_perfix = ["192.168.0.128/26"]
+nsg_name = "nsg_pystackops_prod"
+public_ip_name = "publicIP_prod"
+nic_name = "nic_prod"
+vm_name = "vm-prod"
+vm_size = "Standard_D2s_v3"
