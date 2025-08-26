@@ -21,11 +21,17 @@ jobs :
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.7.5
-
-      - name: Azure Login
+      - name: Azure Login (CLI for later az commands)
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CRED }}
+
+      - name: Export ARM_* env vars for Terraform
+        run: |
+          echo "ARM_CLIENT_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .clientId)" >> $GITHUB_ENV
+          echo "ARM_CLIENT_SECRET=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .clientSecret)" >> $GITHUB_ENV
+          echo "ARM_SUBSCRIPTION_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .subscriptionId)" >> $GITHUB_ENV
+          echo "ARM_TENANT_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .tenantId)" >> $GITHUB_ENV
 
       - name: Terraform Init
         run: terraform -chdir=IAC/envs/dev init
@@ -35,6 +41,7 @@ jobs :
      
       - name: Terraform Apply
         run: terraform -chdir=IAC/envs/dev apply -auto-approve
+
 
       - name: Output ACR Login Server
         id: acr_info
