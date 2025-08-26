@@ -1,8 +1,8 @@
-name: CI - test
+name: CI_TEST
 
 on:
   workflow_run:
-    workflows: ["CI - dev"]
+    workflows: ["CI_DEV"]
     types:
       - completed
 
