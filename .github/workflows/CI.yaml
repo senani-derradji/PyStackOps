@@ -38,6 +38,10 @@ jobs :
       
       - name: Terraform Validate
         run: terraform -chdir=IAC/envs/dev validate
+
+      - name: Force Unlock (if needed)
+        run: terraform -chdir=IAC/envs/dev force-unlock -force 6d1974bb-8531-15f3-61e8-37e64961f1c9 || true
+
      
       - name: Terraform Apply
         run: terraform -chdir=IAC/envs/dev apply -auto-approve
