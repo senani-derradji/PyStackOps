@@ -1,0 +1,31 @@
+name: CI_TEST
+
+on:
+  workflow_run:
+    workflows: ["CI_DEV"]
+    types:
+      - completed
+
+jobs:
+  test_env:
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Export ARM_* env vars for Terraform
+        run: |
+          echo "ARM_CLIENT_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .clientId)" >> $GITHUB_ENV
+          echo "ARM_CLIENT_SECRET=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .clientSecret)" >> $GITHUB_ENV
+          echo "ARM_SUBSCRIPTION_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .subscriptionId)" >> $GITHUB_ENV
+          echo "ARM_TENANT_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .tenantId)" >> $GITHUB_ENV
+
+      - name: Terraform Init
+        run: terraform -chdir=IAC/envs/test init
+
+      - name: Terraform Validate
+        run: terraform -chdir=IAC/envs/test validate
+
+      - name: Terraform Apply
+        run: terraform -chdir=IAC/envs/test apply -auto-approve
