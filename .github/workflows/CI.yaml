@@ -17,9 +17,10 @@ jobs :
       - name : Checkout Repository
         uses: actions/checkout@v2
       - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v1
+        uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 3.108.0
+          terraform_version: 1.7.6
+
       - name: Terraform Init
         run: terraform -chdir=IAC/envs/dev init
       
