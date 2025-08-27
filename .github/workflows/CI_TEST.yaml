@@ -7,10 +7,6 @@ on:
   pull_request:
     branches:
       - dev
-  # workflow_run:
-  #   workflows: ["CI_DEV"]
-  #   types:
-  #     - completed
 
 jobs:
   test_terraform_env:
@@ -28,7 +24,7 @@ jobs:
           echo "ARM_CLIENT_SECRET=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .clientSecret)" >> $GITHUB_ENV
           echo "ARM_SUBSCRIPTION_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .subscriptionId)" >> $GITHUB_ENV
           echo "ARM_TENANT_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .tenantId)" >> $GITHUB_ENV
-      
+
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -40,37 +36,20 @@ jobs:
       - name: SSH PUBKEY ENV
         run: echo "SSH_PUBLIC_KEY=${{ secrets.SSH_PUBLIC_KEY }}" >> $GITHUB_ENV
 
-      - name: Debug SSH_PUBLIC_KEY
-        run: |
-         echo "SSH_PUBLIC_KEY is: $SSH_PUBLIC_KEY"
-         echo "${#SSH_PUBLIC_KEY} characters"
-
-      - name: Terraform PLAN
+      - name: Terraform Plan
         run: terraform -chdir=IAC/envs/test plan -var="ssh_public_key=$SSH_PUBLIC_KEY"
 
-      
       - name: Terraform Apply
         run: terraform -chdir=IAC/envs/test apply -var="ssh_public_key=$SSH_PUBLIC_KEY" -auto-approve
 
       - name: Terraform Output
         id: tf_outputs
         run: |
-         echo "test_vm_ip=$(terraform -chdir=IAC/envs/test output -raw test_vm_ip)" >> $GITHUB_ENV
-         echo "test_vm_ip=${test_vm_ip}" >> $GITHUB_OUTPUT
-         echo $test_vm_ip
+          echo "test_vm_ip=$(terraform -chdir=IAC/envs/test output -raw test_vm_ip)" >> $GITHUB_ENV
+          echo "test_database_fqdn=$(terraform -chdir=IAC/envs/test output -raw test_mysql_fqdn)" >> $GITHUB_ENV
+          echo "test_database_username=$(terraform -chdir=IAC/envs/test output -raw test_mysql_admin)" >> $GITHUB_ENV
+          echo "test_database_password=$(terraform -chdir=IAC/envs/test output -raw test_mysql_password)" >> $GITHUB_ENV
 
-
-         echo "test_database_fqdn=$(terraform -chdir=IAC/envs/test output -raw test_mysql_fqdn)" >> $GITHUB_ENV
-         echo "test_database_fqdn=${test_database_fqdn}" >> $GITHUB_OUTPUT
-         echo $test_database_fqdn
-
-         echo "test_database_username=$(terraform -chdir=IAC/envs/test output -raw test_mysql_admin)" >> $GITHUB_ENV
-         echo "test_database_username=${test_database_username}" >> $GITHUB_OUTPUT
-         echo $test_database_username
-
-         echo "test_database_password=$(terraform -chdir=IAC/envs/test output -raw test_mysql_password)" >> $GITHUB_ENV
-         echo "test_database_password=${test_database_password}" >> $GITHUB_OUTPUT
-         echo $test_database_password
     outputs:
       test_vm_ip: ${{ steps.tf_outputs.outputs.test_vm_ip }}
       test_database_fqdn: ${{ steps.tf_outputs.outputs.test_database_fqdn }}
@@ -83,12 +62,12 @@ jobs:
     environment:
       name: test
     env:
-      test_vm_ip: ${{ needs.test_terraform_env.outputs.test_vm_ip }}
-      test_vm_name: ${{ needs.test_terraform_env.outputs.test_vm_name }}
-      test_database_name: ${{ needs.test_terraform_env.outputs.test_database_name }}
-      test_database_username: ${{ needs.test_terraform_env.outputs.test_database_username }}
-      test_database_password: ${{ needs.test_terraform_env.outputs.test_database_password }}
-      test_database_fqdn: ${{ needs.testest_terraform_envt_env.outputs.test_database_fqdn }}
+      test_vm_ip: ${{ env.test_vm_ip }}
+      test_database_fqdn: ${{ env.test_database_fqdn }}
+      test_database_username: ${{ env.test_database_username }}
+      test_database_password: ${{ env.test_database_password }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
 
     steps:
       - name: Checkout Repository
@@ -104,7 +83,10 @@ jobs:
 
       - name: Test SSH Access to VM
         run: |
-          ssh -o StrictHostKeyChecking=no -i <(echo "$SSH_PRIVATE_KEY") $admin_username@$test_vm_ip "echo 'SSH access successful'"
+          ssh -o StrictHostKeyChecking=no -i <(echo "$SSH_PRIVATE_KEY") $ADMIN_USERNAME@$test_vm_ip "echo 'SSH access successful'"
+
+      - name: Install MySQL client
+        run: sudo apt-get update && sudo apt-get install -y mysql-client
 
       - name: Test Database Connection
         run: |
