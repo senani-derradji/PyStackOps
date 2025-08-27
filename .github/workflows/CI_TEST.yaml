@@ -13,7 +13,7 @@ on:
   #     - completed
 
 jobs:
-  test_env:
+  test_terraform_env:
     runs-on: ubuntu-latest
     environment:
       name: test
@@ -51,3 +51,43 @@ jobs:
       
       - name: Terraform Apply
         run: terraform -chdir=IAC/envs/test apply -var="ssh_public_key=$SSH_PUBLIC_KEY" -auto-approve
+
+    outputs:
+      test_vm_ip: ${{ steps.test_vm_ip.outputs.test_vm_ip }}
+      test_vm_name: ${{ steps.test_vm_name.outputs.test_vm_name }}
+      test_database_name: ${{ steps.test_database_name.outputs.test_database_name }}
+      test_database_username: ${{ steps.test_database_username.outputs.test_database_username }}
+      test_database_password: ${{ steps.test_database_password.outputs.test_database_password }}
+      test_database_fqdn: ${{ steps.test_database_fqdn.outputs.test_database_fqdn }}
+  testing_env:
+    needs: test_env
+    runs-on: ubuntu-latest
+    environment:
+      name: test
+    env:
+      test_vm_ip: ${{ needs.test_env.outputs.test_vm_ip }}
+      test_vm_name: ${{ needs.test_env.outputs.test_vm_name }}
+      test_database_name: ${{ needs.test_env.outputs.test_database_name }}
+      test_database_username: ${{ needs.test_env.outputs.test_database_username }}
+      test_database_password: ${{ needs.test_env.outputs.test_database_password }}
+      test_database_fqdn: ${{ needs.test_env.outputs.test_database_fqdn }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Wait for VM to be ready
+        run: sleep 60
+
+      - name: Test VM Connectivity
+        run: |
+          echo "Testing connectivity to VM at $test_vm_ip"
+          ping -c 4 $test_vm_ip
+
+      - name: Test SSH Access to VM
+        run: |
+          ssh -o StrictHostKeyChecking=no -i <(echo "$SSH_PRIVATE_KEY") $admin_username@$test_vm_ip "echo 'SSH access successful'"
+
+      - name: Test Database Connection
+        run: |
+          mysql -h $test_database_fqdn -u $test_database_username -p$test_database_password -e "SHOW DATABASES;"
