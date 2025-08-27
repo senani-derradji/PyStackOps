@@ -1,70 +1,70 @@
-name: CI_DEV
+# name: CI_DEV
 
-on:
-  push:
-    branches:
-      - dev
-  pull_request:
-    branches:
-      - dev
+# on:
+#   push:
+#     branches:
+#       - dev
+#   pull_request:
+#     branches:
+#       - dev
 
-jobs :
-  # --------------------------------------------- Terraform in Dev ---------------------------------------------
-  Terraform_dev:
-    runs-on: ubuntu-latest
+# jobs :
+#   # --------------------------------------------- Terraform in Dev ---------------------------------------------
+#   Terraform_dev:
+#     runs-on: ubuntu-latest
     
-    steps:
-      - name : Checkout Repository
-        uses: actions/checkout@v2
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 1.7.6
-      - name: Terraform Init
-        run: terraform -chdir=IAC/envs/dev init
+#     steps:
+#       - name : Checkout Repository
+#         uses: actions/checkout@v2
+#       - name: Set up Terraform
+#         uses: hashicorp/setup-terraform@v1
+#         with:
+#           terraform_version: 1.7.6
+#       - name: Terraform Init
+#         run: terraform -chdir=IAC/envs/dev init
       
-      - name: Terraform Validate
-        run: terraform -chdir=IAC/envs/dev validate
+#       - name: Terraform Validate
+#         run: terraform -chdir=IAC/envs/dev validate
      
-      - name: Terraform Apply
-        run: terraform -chdir=IAC/envs/dev apply -auto-approve
+#       - name: Terraform Apply
+#         run: terraform -chdir=IAC/envs/dev apply -auto-approve
 
-      - name: Output ACR Login Server
-        id: acr_info
-        run: |
-          echo "ACR_LOGIN_SERVER=$(terraform -chdir=IAC/envs/dev output -raw acr_login_server)" >> $GITHUB_ENV
-          echo "ACR_NAME=$(terraform -chdir=IAC/envs/dev output -raw acr_name)" >> $GITHUB_ENV
+#       - name: Output ACR Login Server
+#         id: acr_info
+#         run: |
+#           echo "ACR_LOGIN_SERVER=$(terraform -chdir=IAC/envs/dev output -raw acr_login_server)" >> $GITHUB_ENV
+#           echo "ACR_NAME=$(terraform -chdir=IAC/envs/dev output -raw acr_name)" >> $GITHUB_ENV
 
-  # --------------------------------------------- Docker in Dev ---------------------------------------------
-  docker_dev:
-    needs: Terraform_dev
-    runs-on: ubuntu-latest
-    steps:
-      - name : Checkout Repository
-        uses: actions/checkout@v2
+#   # --------------------------------------------- Docker in Dev ---------------------------------------------
+#   docker_dev:
+#     needs: Terraform_dev
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name : Checkout Repository
+#         uses: actions/checkout@v2
       
-      - name : Set Docker Compose
-        run : |
-          docker compose -f docker-compose.yml up -d --build
+#       - name : Set Docker Compose
+#         run : |
+#           docker compose -f docker-compose.yml up -d --build
       
-      - name : Wait for Services
-        run : sleep 15
+#       - name : Wait for Services
+#         run : sleep 15
       
-      - name : Test Flask App
-        run : |
-          cd app
-          sleep 5
-          docker compose exec backend_webapp pytest test_app.py
-      # --------------------------------------------- Push to AZURE ---------------------------------------------
-      - name : azure login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CRED }}
+#       - name : Test Flask App
+#         run : |
+#           cd app
+#           sleep 5
+#           docker compose exec backend_webapp pytest test_app.py
+#       # --------------------------------------------- Push to AZURE ---------------------------------------------
+#       - name : azure login
+#         uses: azure/login@v1
+#         with:
+#           creds: ${{ secrets.AZURE_CRED }}
       
-      - name: push to ACR
-        uses: azure/CLI@v1
-        with:
-          inlineScript: |
-            az acr login --name $ACR_NAME
-            docker tag backend_webapp:latest $ACR_LOGIN_SERVER/backend_webapp:latest
-            docker push $ACR_LOGIN_SERVER/backend_webapp:latest
+#       - name: push to ACR
+#         uses: azure/CLI@v1
+#         with:
+#           inlineScript: |
+#             az acr login --name $ACR_NAME
+#             docker tag backend_webapp:latest $ACR_LOGIN_SERVER/backend_webapp:latest
+#             docker push $ACR_LOGIN_SERVER/backend_webapp:latest
