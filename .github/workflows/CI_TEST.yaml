@@ -52,13 +52,26 @@ jobs:
       - name: Terraform Apply
         run: terraform -chdir=IAC/envs/test apply -var="ssh_public_key=$SSH_PUBLIC_KEY" -auto-approve
 
+      - name: Terraform Output
+        id: tf_outputs
+        run: |
+         echo "test_vm_ip=$(terraform -chdir=IAC/envs/test output -raw test_vm_ip)" >> $GITHUB_ENV
+         echo "test_vm_ip=${test_vm_ip}" >> $GITHUB_OUTPUT
+
+         echo "test_database_fqdn=$(terraform -chdir=IAC/envs/test output -raw test_mysql_fqdn)" >> $GITHUB_ENV
+         echo "test_database_fqdn=${test_database_fqdn}" >> $GITHUB_OUTPUT
+
+         echo "test_database_username=$(terraform -chdir=IAC/envs/test output -raw test_mysql_admin)" >> $GITHUB_ENV
+         echo "test_database_username=${test_database_username}" >> $GITHUB_OUTPUT
+
+         echo "test_database_password=$(terraform -chdir=IAC/envs/test output -raw test_mysql_password)" >> $GITHUB_ENV
+         echo "test_database_password=${test_database_password}" >> $GITHUB_OUTPUT
     outputs:
-      test_vm_ip: ${{ steps.test_vm_ip.outputs.test_vm_ip }}
-      test_vm_name: ${{ steps.test_vm_name.outputs.test_vm_name }}
-      test_database_name: ${{ steps.test_database_name.outputs.test_database_name }}
-      test_database_username: ${{ steps.test_database_username.outputs.test_database_username }}
-      test_database_password: ${{ steps.test_database_password.outputs.test_database_password }}
-      test_database_fqdn: ${{ steps.test_database_fqdn.outputs.test_database_fqdn }}
+      test_vm_ip: ${{ steps.tf_outputs.outputs.test_vm_ip }}
+      test_database_fqdn: ${{ steps.tf_outputs.outputs.test_database_fqdn }}
+      test_database_username: ${{ steps.tf_outputs.outputs.test_database_username }}
+      test_database_password: ${{ steps.tf_outputs.outputs.test_database_password }}
+
   testing_env:
     needs: test_terraform_env
     runs-on: ubuntu-latest
