@@ -37,3 +37,4 @@ variable "mysql_storage_gb" {
     type        = number
     default     = 32
 }
+

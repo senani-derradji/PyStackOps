@@ -8,22 +8,22 @@ output "test_vm_name" {
 }
 
 output "test_mysql_fqdn" {
-  value       = module.database.mysql_fqdn
+  value       = module.database.test_mysql_fqdn
   sensitive   = true
 }
 
 output "test_mysql_admin" {
-  value       = module.database.mysql_admin
+  value       = module.database.test_mysql_admin
   sensitive   = true
 }
 
 output "test_mysql_password" {
-  value       = module.database.mysql_password
+  value       = module.database.test_mysql_password
   sensitive   = true
 }
 
 output "test_mysql_db_name" {
-  value       = module.database.mysql_db_name
+  value       = module.database.test_mysql_db_name
 }
 
 
