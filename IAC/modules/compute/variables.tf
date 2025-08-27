@@ -39,3 +39,7 @@ variable "admin_username" {
 variable "nsg_id" {
   type        = string
 }
+
+variable "ssh_public_key" {
+  type = string
+}

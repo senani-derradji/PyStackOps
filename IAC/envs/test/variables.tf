@@ -56,3 +56,7 @@ variable "admin_username" {
   type    = string
   default = "derradji"
 }
+
+variable "ssh_public_key" {
+  type = string
+}
