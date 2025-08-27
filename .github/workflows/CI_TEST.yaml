@@ -78,7 +78,7 @@ jobs:
       test_database_fqdn: ${{ needs.test_terraform_env.outputs.test_database_fqdn }}
       test_database_username: ${{ needs.test_terraform_env.outputs.test_database_username }}
       test_database_password: ${{ needs.test_terraform_env.outputs.test_database_password }}
-      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      # SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
     steps:
       - name: Checkout Repository
