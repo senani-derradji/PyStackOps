@@ -40,7 +40,12 @@ jobs:
       - name: SSH PUBKEY ENV
         run: echo "SSH_PUBLIC_KEY=${{ secrets.SSH_PUBLIC_KEY }}" >> $GITHUB_ENV
 
-      - name: Terraform Plan
+      - name: Debug SSH_PUBLIC_KEY
+        run: |
+          echo "SSH_PUBLIC_KEY is: $SSH_PUBLIC_KEY"
+          echo "${#SSH_PUBLIC_KEY} characters"
+
+      - name: Terraform PLAN
         run: terraform -chdir=IAC/envs/test plan -var="ssh_public_key=$SSH_PUBLIC_KEY"
 
       - name: Terraform Apply
@@ -49,10 +54,10 @@ jobs:
       - name: Terraform Output
         id: tf_outputs
         run: |
-          echo "test_vm_ip=$(terraform -chdir=IAC/envs/test output -raw test_vm_ip)" >> $GITHUB_ENV
-          echo "test_database_fqdn=$(terraform -chdir=IAC/envs/test output -raw test_mysql_fqdn)" >> $GITHUB_ENV
-          echo "test_database_username=$(terraform -chdir=IAC/envs/test output -raw test_mysql_admin)" >> $GITHUB_ENV
-          echo "test_database_password=$(terraform -chdir=IAC/envs/test output -raw test_mysql_password)" >> $GITHUB_ENV
+          echo "test_vm_ip=$(terraform -chdir=IAC/envs/test output -raw test_vm_ip)" >> $GITHUB_OUTPUT
+          echo "test_database_fqdn=$(terraform -chdir=IAC/envs/test output -raw test_mysql_fqdn)" >> $GITHUB_OUTPUT
+          echo "test_database_username=$(terraform -chdir=IAC/envs/test output -raw test_mysql_admin)" >> $GITHUB_OUTPUT
+          echo "test_database_password=$(terraform -chdir=IAC/envs/test output -raw test_mysql_password)" >> $GITHUB_OUTPUT
 
     outputs:
       test_vm_ip: ${{ steps.tf_outputs.outputs.test_vm_ip }}
@@ -66,10 +71,10 @@ jobs:
     environment:
       name: test
     env:
-      test_vm_ip: ${{ env.test_vm_ip }}
-      test_database_fqdn: ${{ env.test_database_fqdn }}
-      test_database_username: ${{ env.test_database_username }}
-      test_database_password: ${{ env.test_database_password }}
+      test_vm_ip: ${{ needs.test_terraform_env.outputs.test_vm_ip }}
+      test_database_fqdn: ${{ needs.test_terraform_env.outputs.test_database_fqdn }}
+      test_database_username: ${{ needs.test_terraform_env.outputs.test_database_username }}
+      test_database_password: ${{ needs.test_terraform_env.outputs.test_database_password }}
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
 
@@ -88,9 +93,6 @@ jobs:
       - name: Test SSH Access to VM
         run: |
           ssh -o StrictHostKeyChecking=no -i <(echo "$SSH_PRIVATE_KEY") $ADMIN_USERNAME@$test_vm_ip "echo 'SSH access successful'"
-
-      - name: Install MySQL client
-        run: sudo apt-get update && sudo apt-get install -y mysql-client
 
       - name: Test Database Connection
         run: |
