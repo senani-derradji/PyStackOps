@@ -60,7 +60,7 @@ jobs:
       test_database_password: ${{ steps.test_database_password.outputs.test_database_password }}
       test_database_fqdn: ${{ steps.test_database_fqdn.outputs.test_database_fqdn }}
   testing_env:
-    needs: test_env
+    needs: test_terraform_env
     runs-on: ubuntu-latest
     environment:
       name: test
