@@ -30,9 +30,10 @@ jobs:
           echo "ARM_TENANT_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .tenantId)" >> $GITHUB_ENV
 
       - name: Set SSH public key env
-        run: echo "SSH_PUBLIC_KEY<<EOF" >> $GITHUB_ENV
-             ${{ secrets.SSH_PUBLIC_KEY }}
-             EOF
+        run: |
+          echo "SSH_PUBLIC_KEY<<EOF" >> $GITHUB_ENV
+          ${{ secrets.SSH_PUBLIC_KEY }}
+          EOF
 
     
       - name: Set up Terraform
