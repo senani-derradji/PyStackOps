@@ -55,12 +55,14 @@ jobs:
         id: tf_outputs
         run: |
           echo "test_vm_ip=$(terraform -chdir=IAC/envs/test output -raw test_vm_ip)" >> $GITHUB_OUTPUT
+          echo "test_admin_username=$(terraform -chdir=IAC/envs/test output -raw test_admin_username)" >> $GITHUB_OUTPUT
           echo "test_database_fqdn=$(terraform -chdir=IAC/envs/test output -raw test_mysql_fqdn)" >> $GITHUB_OUTPUT
           echo "test_database_username=$(terraform -chdir=IAC/envs/test output -raw test_mysql_admin)" >> $GITHUB_OUTPUT
           echo "test_database_password=$(terraform -chdir=IAC/envs/test output -raw test_mysql_password)" >> $GITHUB_OUTPUT
 
     outputs:
       test_vm_ip: ${{ steps.tf_outputs.outputs.test_vm_ip }}
+      test_admin_username: ${{ steps.tf_outputs.outputs.test_admin_username }}
       test_database_fqdn: ${{ steps.tf_outputs.outputs.test_database_fqdn }}
       test_database_username: ${{ steps.tf_outputs.outputs.test_database_username }}
       test_database_password: ${{ steps.tf_outputs.outputs.test_database_password }}
@@ -72,11 +74,11 @@ jobs:
       name: test
     env:
       test_vm_ip: ${{ needs.test_terraform_env.outputs.test_vm_ip }}
+      test_admin_username: ${{ needs.test_terraform_env.outputs.test_admin_username }}
       test_database_fqdn: ${{ needs.test_terraform_env.outputs.test_database_fqdn }}
       test_database_username: ${{ needs.test_terraform_env.outputs.test_database_username }}
       test_database_password: ${{ needs.test_terraform_env.outputs.test_database_password }}
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
 
     steps:
       - name: Checkout Repository
@@ -89,10 +91,18 @@ jobs:
       #   run: |
       #     echo "Testing connectivity to VM at $test_vm_ip"
       #     ping -c 4 $test_vm_ip
+      - name: ECHO Test
+        run: |
+          echo "Testing connectivity to VM at $test_vm_ip"
+          echo "Using username $test_admin_username"
+          echo "Using DB FQDN $test_database_fqdn"
+          echo "Using DB username $test_database_username"
+          echo "Using DB password $test_database_password"
+
 
       - name: Test SSH Access to VM
         run: |
-          ssh -i ${{ SSH_PRIVATE_KEY }} $ADMIN_USERNAME@$test_vm_ip
+          ssh -i $SSH_PRIVATE_KEY $test_admin_username@$test_vm_ip
 
       - name: Test Database Connection
         run: |

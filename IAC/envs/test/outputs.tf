@@ -7,6 +7,11 @@ output "test_vm_name" {
   value       = module.compute.vm_name
 }
 
+output "test_admin_username" {
+  value       = module.compute.admin_username
+}
+
+
 output "test_mysql_fqdn" {
   value       = module.database.test_mysql_fqdn
   # sensitive   = true
