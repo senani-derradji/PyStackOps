@@ -28,15 +28,14 @@ jobs:
           echo "ARM_CLIENT_SECRET=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .clientSecret)" >> $GITHUB_ENV
           echo "ARM_SUBSCRIPTION_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .subscriptionId)" >> $GITHUB_ENV
           echo "ARM_TENANT_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .tenantId)" >> $GITHUB_ENV
+      
+      - name: Debug SSH key (optional)
+        run: echo "SSH key length ${{ secrets.SSH_PUBLIC_KEY }}"
 
       - name: Set SSH public key env
-        run: |
-         # Remove any quotes or extra characters
-         CLEAN_KEY=$(echo '${{ secrets.SSH_PUBLIC_KEY }}' | tr -d '"' | tr -d "'")
-         echo "SSH_PUBLIC_KEY=$CLEAN_KEY" >> $GITHUB_ENV
+        run: echo "SSH_PUBLIC_KEY=${{ secrets.SSH_PUBLIC_KEY }}" >> $GITHUB_ENV
 
-      - name: Debug SSH key (optional)
-        run: echo "SSH key length $SSH_PUBLIC_KEY"
+      
 
 
       - name: Set up Terraform
