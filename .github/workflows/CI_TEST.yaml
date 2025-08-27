@@ -105,8 +105,8 @@ jobs:
         
       
       - name: Test SSH Access to VM
-        run: |
-          ssh -i $ssh-private-key $test_admin_username@$test_vm_ip
+        run: ssh -o StrictHostKeyChecking=no $test_admin_username@$test_vm_ip "echo connected"
+
 
       - name: Test Database Connection
         run: |
