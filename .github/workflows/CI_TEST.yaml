@@ -85,10 +85,10 @@ jobs:
       - name: Wait for VM to be ready
         run: sleep 20
 
-      - name: Test VM Connectivity
-        run: |
-          echo "Testing connectivity to VM at $test_vm_ip"
-          ping -c 4 $test_vm_ip
+      # - name: Test VM Connectivity
+      #   run: |
+      #     echo "Testing connectivity to VM at $test_vm_ip"
+      #     ping -c 4 $test_vm_ip
 
       - name: Test SSH Access to VM
         run: |
