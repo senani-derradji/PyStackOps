@@ -95,4 +95,4 @@ jobs:
           az acr login --name "$ACR_NAME"
           docker tag pystackops-backend_webapp:latest "$ACR_LOGIN_SERVER/backend_webapp:latest"
           docker push "$ACR_LOGIN_SERVER/backend_webapp:latest"
-    # -----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------------------------------------------
