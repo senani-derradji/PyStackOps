@@ -7,6 +7,10 @@ on:
   pull_request:
     branches:
       - dev
+  # workflow_run:
+  #   workflows: ["CI_DEV"]
+  #   types:
+  #     - completed
 
 jobs:
   test_env:
@@ -24,15 +28,21 @@ jobs:
           echo "ARM_CLIENT_SECRET=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .clientSecret)" >> $GITHUB_ENV
           echo "ARM_SUBSCRIPTION_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .subscriptionId)" >> $GITHUB_ENV
           echo "ARM_TENANT_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .tenantId)" >> $GITHUB_ENV
+      
 
-      - name: Create SSH public key file
+      - name: Set SSH public key env (base64 encoded)
         run: |
-          # Write the SSH key to a file
-          echo '${{ secrets.SSH_PUBLIC_KEY }}' > ssh_key.pub
-          # Verify the file content (optional debugging)
-          echo "SSH key content:"
-          cat ssh_key.pub
+         SSH_ENCODED=$(echo '${{ secrets.SSH_PUBLIC_KEY }}' | base64 -w 0)
+         echo "SSH_PUBLIC_KEY_ENCODED=$SSH_ENCODED" >> $GITHUB_ENV
+      
+      
 
+      - name: public key debug
+        run: |
+         echo $SSH_PUBLIC_KEY_ENCODED
+         echo $SSH_PUBLIC_KEY_ENCODED | base64 -d
+         SSH_PUBLIC_KEY=$(echo "$SSH_PUBLIC_KEY_ENCODED" | base64 -d)
+         echo $SSH_PUBLIC_KEY
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -42,16 +52,11 @@ jobs:
         run: terraform -chdir=IAC/envs/test init
 
       - name: Terraform Validate
-        run: |
-          SSH_KEY_CONTENT=$(cat ssh_key.pub)
-          terraform -chdir=IAC/envs/test -var "ssh_public_key=$SSH_KEY_CONTENT" validate
+        run: terraform -chdir=IAC/envs/test -var "ssh_public_key=$SSH_PUBLIC_KEY" validate
 
       - name: Terraform PLAN
-        run: |
-          SSH_KEY_CONTENT=$(cat ssh_key.pub)
-          terraform -chdir=IAC/envs/test -var "ssh_public_key=$SSH_KEY_CONTENT" plan
+        run: terraform -chdir=IAC/envs/test -var "ssh_public_key=$SSH_PUBLIC_KEY" validate
 
+      
       - name: Terraform Apply
-        run: |
-          SSH_KEY_CONTENT=$(cat ssh_key.pub)
-          terraform -chdir=IAC/envs/test -var "ssh_public_key=$SSH_KEY_CONTENT" apply -auto-approve
+        run: terraform -chdir=IAC/envs/test -var "ssh_public_key=$SSH_PUBLIC_KEY" validate -auto-approve
