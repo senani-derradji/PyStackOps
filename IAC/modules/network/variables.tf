@@ -33,10 +33,3 @@ variable "subnet_name" {
   default     = "subnet_name"
   description = "subnet name of subnet resource"
 }
-
-
-variable "nsg_name" {
-  type        = string
-  default     = "nsg"
-  description = "network security group name"
-}

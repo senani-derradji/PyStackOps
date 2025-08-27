@@ -36,10 +36,6 @@ variable "admin_username" {
   default     = "derradji"
 }
 
-variable "nsg_id" {
-  type        = string
-}
-
 variable "ssh_public_key" {
   type = string
 }
