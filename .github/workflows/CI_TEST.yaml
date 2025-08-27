@@ -57,15 +57,20 @@ jobs:
         run: |
          echo "test_vm_ip=$(terraform -chdir=IAC/envs/test output -raw test_vm_ip)" >> $GITHUB_ENV
          echo "test_vm_ip=${test_vm_ip}" >> $GITHUB_OUTPUT
+         echo $test_vm_ip
+
 
          echo "test_database_fqdn=$(terraform -chdir=IAC/envs/test output -raw test_mysql_fqdn)" >> $GITHUB_ENV
          echo "test_database_fqdn=${test_database_fqdn}" >> $GITHUB_OUTPUT
+         echo $test_database_fqdn
 
          echo "test_database_username=$(terraform -chdir=IAC/envs/test output -raw test_mysql_admin)" >> $GITHUB_ENV
          echo "test_database_username=${test_database_username}" >> $GITHUB_OUTPUT
+         echo $test_database_username
 
          echo "test_database_password=$(terraform -chdir=IAC/envs/test output -raw test_mysql_password)" >> $GITHUB_ENV
          echo "test_database_password=${test_database_password}" >> $GITHUB_OUTPUT
+         echo $test_database_password
     outputs:
       test_vm_ip: ${{ steps.tf_outputs.outputs.test_vm_ip }}
       test_database_fqdn: ${{ steps.tf_outputs.outputs.test_database_fqdn }}
