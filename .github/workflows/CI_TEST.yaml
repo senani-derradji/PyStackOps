@@ -50,4 +50,4 @@ jobs:
 
       
       - name: Terraform Apply
-        run: terraform -chdir=IAC/envs/test validate -var="ssh_public_key=$SSH_PUBLIC_KEY" apply -auto-approve
+        run: terraform -chdir=IAC/envs/test apply -var="ssh_public_key=$SSH_PUBLIC_KEY" -auto-approve
