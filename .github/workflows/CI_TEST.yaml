@@ -92,7 +92,7 @@ jobs:
 
       - name: Test SSH Access to VM
         run: |
-          ssh -o StrictHostKeyChecking=no -i <(echo "$SSH_PRIVATE_KEY") $ADMIN_USERNAME@$test_vm_ip "echo 'SSH access successful'"
+          ssh -i ${{ SSH_PRIVATE_KEY }} $ADMIN_USERNAME@$test_vm_ip
 
       - name: Test Database Connection
         run: |
