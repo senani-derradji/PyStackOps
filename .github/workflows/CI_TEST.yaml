@@ -29,20 +29,6 @@ jobs:
           echo "ARM_SUBSCRIPTION_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .subscriptionId)" >> $GITHUB_ENV
           echo "ARM_TENANT_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .tenantId)" >> $GITHUB_ENV
       
-
-      - name: Set SSH public key env (base64 encoded)
-        run: |
-         SSH_ENCODED=$(echo '${{ secrets.SSH_PUBLIC_KEY }}' | base64 -w 0)
-         echo "SSH_PUBLIC_KEY_ENCODED=$SSH_ENCODED" >> $GITHUB_ENV
-      
-      
-
-      - name: public key debug
-        run: |
-         echo $SSH_PUBLIC_KEY_ENCODED
-         echo $SSH_PUBLIC_KEY_ENCODED | base64 -d
-         SSH_PUBLIC_KEY=$(echo "$SSH_PUBLIC_KEY_ENCODED" | base64 -d)
-         echo $SSH_PUBLIC_KEY
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -53,15 +39,9 @@ jobs:
 
       # - name: Terraform Validate
       #   run: terraform -chdir=IAC/envs/test validate -var="ssh_public_key=$SSH_PUBLIC_KEY"
-      - name: Set SSH public key env (base64 encoded)
-        run: |
-         SSH_ENCODED=$(echo '${{ secrets.SSH_PUBLIC_KEY }}' | base64 -w 0)
-         echo "SSH_PUBLIC_KEY_ENCODED=$SSH_ENCODED" >> $GITHUB_ENV
 
-      - name: Decode SSH_PUBLIC_KEY and export
-        run: |
-         echo "$SSH_PUBLIC_KEY_ENCODED" | base64 -d > decoded_key.pub
-         echo "SSH_PUBLIC_KEY=$(cat decoded_key.pub)" >> $GITHUB_ENV
+      - name: SSH PUBKEY ENV
+        run: echo "SSH_PUBLIC_KEY=${{ secrets.SSH_PUBLIC_KEY }}" >> $GITHUB_ENV
 
       - name: Debug SSH_PUBLIC_KEY
         run: |
