@@ -65,12 +65,12 @@ jobs:
     environment:
       name: test
     env:
-      test_vm_ip: ${{ needs.test_env.outputs.test_vm_ip }}
-      test_vm_name: ${{ needs.test_env.outputs.test_vm_name }}
-      test_database_name: ${{ needs.test_env.outputs.test_database_name }}
-      test_database_username: ${{ needs.test_env.outputs.test_database_username }}
-      test_database_password: ${{ needs.test_env.outputs.test_database_password }}
-      test_database_fqdn: ${{ needs.test_env.outputs.test_database_fqdn }}
+      test_vm_ip: ${{ needs.test_terraform_env.outputs.test_vm_ip }}
+      test_vm_name: ${{ needs.test_terraform_env.outputs.test_vm_name }}
+      test_database_name: ${{ needs.test_terraform_env.outputs.test_database_name }}
+      test_database_username: ${{ needs.test_terraform_env.outputs.test_database_username }}
+      test_database_password: ${{ needs.test_terraform_env.outputs.test_database_password }}
+      test_database_fqdn: ${{ needs.testest_terraform_envt_env.outputs.test_database_fqdn }}
 
     steps:
       - name: Checkout Repository
