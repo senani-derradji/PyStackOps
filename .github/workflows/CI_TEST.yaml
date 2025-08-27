@@ -32,9 +32,13 @@ jobs:
       - name: Debug SSH key (optional)
         run: echo "SSH key length ${{ secrets.SSH_PUBLIC_KEY }}"
 
-      - name: Set SSH public key env
-        run: echo "SSH_PUBLIC_KEY=${{ secrets.SSH_PUBLIC_KEY }}" >> $GITHUB_ENV
-
+      - name: Set SSH public key env (base64 encoded)
+        run: |
+         SSH_ENCODED=$(echo '${{ secrets.SSH_PUBLIC_KEY }}' | base64 -w 0)
+         echo "SSH_PUBLIC_KEY_ENCODED=$SSH_ENCODED" >> $GITHUB_ENV
+      
+      - name: Debug SSH key (optional)
+        run: echo "SSH key length $SSH_PUBLIC_KEY_ENCODED ---- $SSH_ENCODED"
       
 
 
