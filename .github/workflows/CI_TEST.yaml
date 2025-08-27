@@ -9,7 +9,12 @@ on:
 jobs:
   test_env:
     runs-on: ubuntu-latest
-    environment: test
+    environment:
+      name: test
+      wait_timer: 0
+      reviewers:
+        - senani-derradji
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
