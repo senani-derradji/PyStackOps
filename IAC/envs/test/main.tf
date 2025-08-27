@@ -23,3 +23,14 @@ module compute {
   ssh_public_key = var.ssh_public_key
 }
 
+module database {
+  source = "../../modules/database"
+  location = module.network.location
+  resource_group_name = module.network.rg_name
+  mysql_server_name = var.mysql_name
+  mysql_db_name = var.mysql_db_name
+  mysql_admin = var.mysql_admin
+  mysql_password = var.mysql_password
+  mysql_sku_name = var.mysql_sku_name
+  mysql_storage_gb = var.mysql_storage_gb
+}

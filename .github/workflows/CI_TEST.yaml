@@ -37,9 +37,6 @@ jobs:
       - name: Terraform Init
         run: terraform -chdir=IAC/envs/test init
 
-      # - name: Terraform Validate
-      #   run: terraform -chdir=IAC/envs/test validate -var="ssh_public_key=$SSH_PUBLIC_KEY"
-
       - name: SSH PUBKEY ENV
         run: echo "SSH_PUBLIC_KEY=${{ secrets.SSH_PUBLIC_KEY }}" >> $GITHUB_ENV
 
@@ -52,5 +49,5 @@ jobs:
         run: terraform -chdir=IAC/envs/test plan -var="ssh_public_key=$SSH_PUBLIC_KEY"
 
       
-      # - name: Terraform Apply
-      #   run: terraform -chdir=IAC/envs/test validate -var="ssh_public_key=$SSH_PUBLIC_KEY" apply -auto-approve
+      - name: Terraform Apply
+        run: terraform -chdir=IAC/envs/test validate -var="ssh_public_key=$SSH_PUBLIC_KEY" apply -auto-approve
