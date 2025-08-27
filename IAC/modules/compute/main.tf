@@ -19,10 +19,10 @@ resource "azurerm_network_interface" "network_interface" {
   }
 }
 
-# resource "azurerm_network_interface_security_group_association" "nic_nsg" {
-#   network_interface_id          = azurerm_network_interface.network_interface.id
-#   network_security_group_id     = var.nsg_id
-# }
+resource "azurerm_network_interface_security_group_association" "nic_nsg" {
+  network_interface_id          = azurerm_network_interface.network_interface.id
+  network_security_group_id     = var.nsg_id
+}
 
 
 resource "azurerm_linux_virtual_machine" "vm" {
