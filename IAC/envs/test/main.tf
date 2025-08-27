@@ -26,8 +26,8 @@ module compute {
 module database {
   source = "../../modules/database"
   location = module.network.location
-  resource_group_name = module.network.rg_name
-  mysql_server_name = var.mysql_name
+  rg_name = module.network.rg_name
+  mysql_name = var.mysql_name
   mysql_db_name = var.mysql_db_name
   mysql_admin = var.mysql_admin
   mysql_password = var.mysql_password
