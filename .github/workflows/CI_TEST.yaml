@@ -29,16 +29,12 @@ jobs:
           echo "ARM_SUBSCRIPTION_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .subscriptionId)" >> $GITHUB_ENV
           echo "ARM_TENANT_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .tenantId)" >> $GITHUB_ENV
       
-      - name: Debug SSH key (optional)
-        run: echo "SSH key length ${{ secrets.SSH_PUBLIC_KEY }}"
 
       - name: Set SSH public key env (base64 encoded)
         run: |
          SSH_ENCODED=$(echo '${{ secrets.SSH_PUBLIC_KEY }}' | base64 -w 0)
          echo "SSH_PUBLIC_KEY_ENCODED=$SSH_ENCODED" >> $GITHUB_ENV
       
-      - name: Debug SSH key (optional)
-        run: echo "SSH key length $SSH_PUBLIC_KEY_ENCODED ---- $SSH_ENCODED"
       
 
 
@@ -51,11 +47,17 @@ jobs:
         run: terraform -chdir=IAC/envs/test init
 
       - name: Terraform Validate
-        run: terraform -chdir=IAC/envs/test -var "ssh_public_key=$SSH_PUBLIC_KEY" validate
+        run: |
+         SSH_PUBLIC_KEY=$(echo "$SSH_PUBLIC_KEY_ENCODED" | base64 -d)
+         terraform -chdir=IAC/envs/test -var "ssh_public_key=$SSH_PUBLIC_KEY" validate
 
       - name: Terraform PLAN
-        run: terraform -chdir=IAC/envs/test -var "ssh_public_key=$SSH_PUBLIC_KEY" plan
+        run: |
+         SSH_PUBLIC_KEY=$(echo "$SSH_PUBLIC_KEY_ENCODED" | base64 -d)
+         terraform -chdir=IAC/envs/test -var "ssh_public_key=$SSH_PUBLIC_KEY" plan
 
       
       - name: Terraform Apply
-        run: terraform -chdir=IAC/envs/test -var "ssh_public_key=$SSH_PUBLIC_KEY" apply -auto-approve
+        run: |
+         SSH_PUBLIC_KEY=$(echo "$SSH_PUBLIC_KEY_ENCODED" | base64 -d)
+         terraform -chdir=IAC/envs/test -var "ssh_public_key=$SSH_PUBLIC_KEY" apply -auto-approve
