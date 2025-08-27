@@ -11,9 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: test
-      wait_timer: 0
-      reviewers:
-        - senani-derradji
 
     steps:
       - name: Checkout Repository
