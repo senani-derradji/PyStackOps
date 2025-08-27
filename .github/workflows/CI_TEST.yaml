@@ -98,11 +98,15 @@ jobs:
           echo "Using DB FQDN $test_database_fqdn"
           echo "Using DB username $test_database_username"
           echo "Using DB password $test_database_password"
-
-
+      - name: SSH Connection
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        
+      
       - name: Test SSH Access to VM
         run: |
-          ssh -i $SSH_PRIVATE_KEY $test_admin_username@$test_vm_ip
+          ssh -i $ssh-private-key $test_admin_username@$test_vm_ip
 
       - name: Test Database Connection
         run: |
