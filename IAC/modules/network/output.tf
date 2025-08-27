@@ -17,7 +17,3 @@ output "rg_name" {
 output "location" {
   value = azurerm_resource_group.rg.location
 }
-
-output "nsg_id" {
-  value = azurerm_network_security_group.nsg.id
-}
