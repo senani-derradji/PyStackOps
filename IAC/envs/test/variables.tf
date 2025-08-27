@@ -27,11 +27,6 @@ variable "subnet_perfix" {
   type        = list(string)
 }
 
-variable "nsg_name" {
-  type    = string
-  default = "nsg"
-}
-
 variable "public_ip_name" {
   type    = string
   default = "publicIP"
