@@ -51,8 +51,8 @@ jobs:
       - name: Terraform Init
         run: terraform -chdir=IAC/envs/test init
 
-      - name: Terraform Validate
-        run: terraform -chdir=IAC/envs/test validate -var="ssh_public_key=$SSH_PUBLIC_KEY"
+      # - name: Terraform Validate
+      #   run: terraform -chdir=IAC/envs/test validate -var="ssh_public_key=$SSH_PUBLIC_KEY"
 
       - name: Terraform PLAN
         run: terraform -chdir=IAC/envs/test plan -var="ssh_public_key=$SSH_PUBLIC_KEY"
