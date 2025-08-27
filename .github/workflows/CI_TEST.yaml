@@ -1,16 +1,10 @@
 name: CI_TEST
 
 on:
-  push:
-    branches:
-      - dev
-  pull_request:
-    branches:
-      - dev
-  # workflow_run:
-  #   workflows: ["CI_DEV"]
-  #   types:
-  #     - completed
+  workflow_run:
+    workflows: ["CI_DEV"]
+    types:
+      - completed
 
 jobs:
   test_terraform_env:
@@ -111,3 +105,5 @@ jobs:
       - name: Test Database Connection
         run: |
           mysql -h $test_database_fqdn -u $test_database_username -p$test_database_password -e "SHOW DATABASES;"
+
+  
