@@ -54,6 +54,12 @@ jobs:
       # - name: Terraform Validate
       #   run: terraform -chdir=IAC/envs/test validate -var="ssh_public_key=$SSH_PUBLIC_KEY"
 
+      - name: Debug SSH_PUBLIC_KEY
+        run: |
+         echo "SSH_PUBLIC_KEY is: $SSH_PUBLIC_KEY"
+         echo "${#SSH_PUBLIC_KEY} characters"
+
+
       - name: Terraform PLAN
         run: terraform -chdir=IAC/envs/test plan -var="ssh_public_key=$SSH_PUBLIC_KEY"
 
