@@ -53,16 +53,20 @@ jobs:
 
       # - name: Terraform Validate
       #   run: terraform -chdir=IAC/envs/test validate -var="ssh_public_key=$SSH_PUBLIC_KEY"
-      - name: Set SSH_PUBLIC_KEY env
+      - name: Set SSH public key env (base64 encoded)
         run: |
-         echo "SSH_PUBLIC_KEY=$SSH_PUBLIC_KEY" >> $GITHUB_ENV
-    
+         SSH_ENCODED=$(echo '${{ secrets.SSH_PUBLIC_KEY }}' | base64 -w 0)
+         echo "SSH_PUBLIC_KEY_ENCODED=$SSH_ENCODED" >> $GITHUB_ENV
+
+      - name: Decode SSH_PUBLIC_KEY and export
+        run: |
+         echo "$SSH_PUBLIC_KEY_ENCODED" | base64 -d > decoded_key.pub
+         echo "SSH_PUBLIC_KEY=$(cat decoded_key.pub)" >> $GITHUB_ENV
+
       - name: Debug SSH_PUBLIC_KEY
         run: |
          echo "SSH_PUBLIC_KEY is: $SSH_PUBLIC_KEY"
          echo "${#SSH_PUBLIC_KEY} characters"
-
-
 
       - name: Terraform PLAN
         run: terraform -chdir=IAC/envs/test plan -var="ssh_public_key=$SSH_PUBLIC_KEY"
