@@ -36,9 +36,9 @@ jobs:
          echo "SSH_PUBLIC_KEY=$CLEAN_KEY" >> $GITHUB_ENV
 
       - name: Debug SSH key (optional)
-        run: echo "SSH key length: ${#SSH_PUBLIC_KEY}"
+        run: echo "SSH key length $SSH_PUBLIC_KEY"
 
-        
+
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
         with:
