@@ -6,7 +6,6 @@ module network {
   address_space = var.address_space
   subnet_name = var.subnet_name
   subnet_perfix = var.subnet_perfix
-  nsg_name = var.nsg_name
 }
 
 module acr {

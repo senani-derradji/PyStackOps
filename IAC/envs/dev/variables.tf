@@ -27,10 +27,6 @@ variable "subnet_perfix" {
   type        = list(string)
 }
 
-variable "nsg_name" {
-  type    = string
-  default = "nsg"
-}
 
 variable "acr_name" {
   type        = string
