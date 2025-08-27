@@ -9,10 +9,10 @@ output "test_mysql_fqdn" {
 
 output "test_mysql_db_name" {
   value       = azurerm_mysql_flexible_server.mysqlserver.name
-  sensitive   = false
+  # sensitive   = false
 }
 
 output "test_mysql_password" {
   value       = var.mysql_password
-  sensitive   = true
+  # sensitive   = true
 }

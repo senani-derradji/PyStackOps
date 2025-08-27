@@ -1,6 +1,6 @@
 output "test_vm_ip" {
   value       = module.compute.public_ip_address
-  sensitive   = true
+  # sensitive   = true
 }
 
 output "test_vm_name" {
@@ -9,17 +9,17 @@ output "test_vm_name" {
 
 output "test_mysql_fqdn" {
   value       = module.database.test_mysql_fqdn
-  sensitive   = true
+  # sensitive   = true
 }
 
 output "test_mysql_admin" {
   value       = module.database.test_mysql_admin
-  sensitive   = true
+  # sensitive   = true
 }
 
 output "test_mysql_password" {
   value       = module.database.test_mysql_password
-  sensitive   = true
+  # sensitive   = true
 }
 
 output "test_mysql_db_name" {
