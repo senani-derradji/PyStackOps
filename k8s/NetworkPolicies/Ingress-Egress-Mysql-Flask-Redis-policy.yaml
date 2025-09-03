@@ -23,6 +23,7 @@ spec:
     - podSelector:
         matchLabels:
           app: redis
+    
     ports:
     - protocol: TCP
       port: 6379

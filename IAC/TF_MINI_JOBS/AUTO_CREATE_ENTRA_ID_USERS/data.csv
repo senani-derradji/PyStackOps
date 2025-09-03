@@ -1,0 +1,4 @@
+user_principal_name,display_name,password,group
+alice@DrProoutlook.onmicrosoft.com,Alice Smith,Passw0rd123!,Developers
+bob@DrProoutlook.onmicrosoft.com,Bob Brown,Passw0rd123!,Admins
+charlie@DrProoutlook.onmicrosoft.com,Charlie Stone,Passw0rd123!,Developers

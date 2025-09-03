@@ -1,0 +1,8 @@
+name: CI_TEST
+
+on:
+  workflow_run:
+    workflows: ["CI_TEST.yaml"]
+
+    types:
+      - completed

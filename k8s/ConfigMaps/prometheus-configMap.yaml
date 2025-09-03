@@ -10,7 +10,7 @@ data:
     scrape_configs:
       - job_name: "prometheus"
         static_configs:
-           - targets: ["localhost:9090"]
+           - targets: ["prometheus-service.default.svc.cluster.local:9090"]
 
       - job_name: "mysql"
         static_configs:
