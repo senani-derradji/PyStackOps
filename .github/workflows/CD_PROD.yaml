@@ -1,8 +1,8 @@
-name: CI_TEST
+# name: CI_TEST
 
-on:
-  workflow_run:
-    workflows: ["CI_TEST.yaml"]
+# on:
+#   workflow_run:
+#     workflows: ["CI_TEST.yaml"]
 
-    types:
-      - completed
+#     types:
+#       - completed
