@@ -39,7 +39,7 @@ jobs:
 
       # 🔹 Upload reports as artifacts
       - name: Upload Trivy Reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: trivy-reports
           path: |
