@@ -1,35 +1,48 @@
-name: CI_DEV
+name: Security_Scan
 
 on:
   push:
-    branches:
-      - dev
+    branches: [ dev ]
   pull_request:
-    branches:
-      - dev
+    branches: [ dev ]
 
 jobs:
-  build_dev:
+  trivy_scan:
     runs-on: ubuntu-latest
-    environment:
-      name: dev
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
 
-      - name: Set up Docker Buildx
-        uses: docker/login-action@v2
-        with:
-          registry: docker.io
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 🔹 Build Docker image
       - name: Build Docker image
         run: |
           cd app
-          docker build -t python-backend:latest .
-      - name: install trivy scanner
+          docker build -t my-backend:latest .
+
+      # 🔹 Install Trivy
+      - name: Install Trivy
         run: |
-          wget https://github.com/aquasecurity/trivy/releases/download/v0.18.3/trivy_0.18.3_Linux-64bit.deb
-          sudo dpkg -i trivy_0.18.3_Linux-64bit.deb
-      - name: Scan Docker image
-        run: trivy image --exit-code 1 --severity HIGH,CRITICAL python-backend:latest || true
+          wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.55.2_Linux-64bit.deb
+          sudo dpkg -i trivy_0.55.2_Linux-64bit.deb
+
+      # 🔹 Scan Docker image
+      - name: Trivy Image Scan
+        run: |
+          trivy image --format json --output trivy-image-report.json my-backend:latest
+
+      # 🔹 Scan Kubernetes / Terraform / Compose configs
+      - name: Trivy Config Scan
+        run: |
+          trivy config --format json --output trivy-config-report.json ./k8s
+          trivy config --format json --output trivy-iac-report.json ./IAC
+
+      # 🔹 Upload reports as artifacts
+      - name: Upload Trivy Reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: trivy-reports
+          path: |
+            trivy-image-report.json
+            trivy-config-report.json
+            trivy-iac-report.json
