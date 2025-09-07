@@ -1,0 +1,61 @@
+rules:
+  id: no-print_python
+  patterns:
+    - pattern: print(...)
+  message: "Avoid using print statements in production code."
+  severity: WARNING
+  languages: [python]
+  metadata:
+    category: best-practice
+    technology: python
+  
+  id: no-os-system
+  patterns:
+    - pattern: os.system(...)
+  message: "Avoid using os.system for executing shell commands. Use subprocess module instead."
+  severity: ERROR
+  languages: [python]
+  metadata:
+    category: security
+    technology: python
+  
+  id: no-credential-in-code
+  patterns:
+    - pattern: '"A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}"'
+  message: "Avoid hardcoding credentials in the code."
+  severity: CRITICAL
+  languages: [python]
+  metadata:
+    category: security
+    technology: python
+  
+  id: use-f-strings
+  patterns:
+    - pattern: '"%s" % ...'
+  message: "Use f-strings for string formatting instead of the % operator."
+  severity: INFO
+  languages: [python]
+  metadata:
+    category: best-practice
+    technology: python
+  
+  id: no-eval
+  patterns:
+    - pattern: eval(...)
+  message: "Avoid using eval() as it can lead to security vulnerabilities."
+  severity: CRITICAL
+  languages: [python]
+  metadata:
+    category: security
+    technology: python
+
+  id: no-mutable-default-args
+  patterns:
+    - pattern: def $FUNC(..., $ARG=[]):
+    - pattern: def $FUNC(..., $ARG={}):
+  message: "Avoid using mutable default arguments in function definitions."
+  severity: WARNING
+  languages: [python]
+  metadata:
+    category: best-practice
+    technology: python
