@@ -1,48 +1,24 @@
-name: Security_Scan
+name: Semgrep Code Scan
 
 on:
   push:
-    branches: [ dev ]
+    branches: [ "dev" ]
   pull_request:
-    branches: [ dev ]
+    branches: [ "dev" ]
 
 jobs:
-  trivy_scan:
+  semgrep:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout code
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 🔹 Build Docker image
-      - name: Build Docker image
-        run: |
-          cd app
-          docker build -t my-backend:latest .
+      # Install Semgrep
+      - name: Setup Semgrep
+        uses: returntocorp/semgrep-action@v1
 
-      # 🔹 Install Trivy
-      - name: Install Trivy
-        run: |
-         wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0_Linux-64bit.deb
-         sudo dpkg -i trivy_0_Linux-64bit.deb
-
-      # 🔹 Scan Docker image
-      - name: Trivy Image Scan
-        run: |
-          trivy image --format json --output trivy-image-report.json my-backend:latest
-
-      # 🔹 Scan Kubernetes / Terraform / Compose configs
-      - name: Trivy Config Scan
-        run: |
-          trivy config --format json --output trivy-config-report.json ./k8s
-          trivy config --format json --output trivy-iac-report.json ./IAC
-
-      # 🔹 Upload reports as artifacts
-      - name: Upload Trivy Reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-reports
-          path: |
-            trivy-image-report.json
-            trivy-config-report.json
-            trivy-iac-report.json
+      # Run Semgrep with default rules
+      - name: Run Semgrep Scan
+        run:  semgrep --config auto --error app/
