@@ -15,10 +15,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Install Semgrep
-      - name: Setup Semgrep
-        uses: returntocorp/semgrep-action@v1
+      - name: Install Semgrep
+        run: pip install semgrep
 
-      # Run Semgrep with default rules
-      - name: Run Semgrep Scan
-        run:  semgrep --config auto --error app/
+      - name: Run Semgrep
+        run: semgrep --config auto --error app/
