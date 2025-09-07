@@ -22,7 +22,7 @@ jobs:
         run: semgrep --config auto --json --output semgrep-results.json app/
       
       - name: Upload Semgrep results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: semgrep-results
           path: semgrep-results.json
