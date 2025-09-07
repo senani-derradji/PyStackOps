@@ -19,4 +19,10 @@ jobs:
         run: pip install semgrep
 
       - name: Run Semgrep
-        run: semgrep --config auto --error app/
+        run: semgrep --config auto --json --output semgrep-results.json app/
+      
+      - name: Upload Semgrep results
+        uses: actions/upload-artifact@v3
+        with:
+          name: semgrep-results
+          path: semgrep-results.json
