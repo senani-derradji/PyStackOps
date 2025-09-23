@@ -12,6 +12,6 @@ jobs:
       - name: Run K8s Manifests
         run : |
           ls
-          ./k8s/Kind/apply.sh
+          sudo bash ./k8s/Kind/apply.sh
       
 
