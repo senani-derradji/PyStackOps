@@ -12,4 +12,5 @@ jobs:
       - name: Run tests
         run: |
           echo "Running tests..."
+          source env-ops/bin/activate
           python app/test-app.py
