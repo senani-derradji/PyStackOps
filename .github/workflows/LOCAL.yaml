@@ -12,5 +12,6 @@ jobs:
       - name: Run tests
         run: |
           echo "Running tests..."
+          python3 -m venv env-ops
           source env-ops/bin/activate
-          python app/test-app.py
+          python3 app/test-app.py
