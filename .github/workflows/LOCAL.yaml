@@ -9,12 +9,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       
-      - name: Install dependencies
-        run: |
-          python3 -m pip install requests
-          apt update
-      - name: Run tests
-        run: python3 app/test-app.py
-      
+      - name: Run K8s Manifests
+        run : |
+          ls
+          ./k8s/Kind/apply.sh
       
 

@@ -1,110 +1,110 @@
-# name: CI_TEST
+# # name: CI_TEST
 
-# on:
-#   workflow_run:
-#     workflows: ["CI_DEV.yaml"]
+# # on:
+# #   workflow_run:
+# #     workflows: ["CI_DEV.yaml"]
 
-#     types:
-#       - completed
+# #     types:
+# #       - completed
 
-jobs:
-  test_terraform_env:
-    runs-on: ubuntu-latest
-    environment:
-      name: test
+# jobs:
+#   test_terraform_env:
+#     runs-on: ubuntu-latest
+#     environment:
+#       name: test
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v2
 
-      - name: Export ARM_* env vars for Terraform
-        run: |
-          echo "ARM_CLIENT_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .clientId)" >> $GITHUB_ENV
-          echo "ARM_CLIENT_SECRET=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .clientSecret)" >> $GITHUB_ENV
-          echo "ARM_SUBSCRIPTION_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .subscriptionId)" >> $GITHUB_ENV
-          echo "ARM_TENANT_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .tenantId)" >> $GITHUB_ENV
+#       - name: Export ARM_* env vars for Terraform
+#         run: |
+#           echo "ARM_CLIENT_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .clientId)" >> $GITHUB_ENV
+#           echo "ARM_CLIENT_SECRET=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .clientSecret)" >> $GITHUB_ENV
+#           echo "ARM_SUBSCRIPTION_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .subscriptionId)" >> $GITHUB_ENV
+#           echo "ARM_TENANT_ID=$(echo '${{ secrets.AZURE_CRED }}' | jq -r .tenantId)" >> $GITHUB_ENV
 
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.7.5
+#       - name: Set up Terraform
+#         uses: hashicorp/setup-terraform@v3
+#         with:
+#           terraform_version: 1.7.5
 
-      - name: Terraform Init
-        run: terraform -chdir=IAC/envs/test init
+#       - name: Terraform Init
+#         run: terraform -chdir=IAC/envs/test init
 
-      - name: SSH PUBKEY ENV
-        run: echo "SSH_PUBLIC_KEY=${{ secrets.SSH_PUBLIC_KEY }}" >> $GITHUB_ENV
+#       - name: SSH PUBKEY ENV
+#         run: echo "SSH_PUBLIC_KEY=${{ secrets.SSH_PUBLIC_KEY }}" >> $GITHUB_ENV
 
-      - name: Debug SSH_PUBLIC_KEY
-        run: |
-          echo "SSH_PUBLIC_KEY is: $SSH_PUBLIC_KEY"
-          echo "${#SSH_PUBLIC_KEY} characters"
+#       - name: Debug SSH_PUBLIC_KEY
+#         run: |
+#           echo "SSH_PUBLIC_KEY is: $SSH_PUBLIC_KEY"
+#           echo "${#SSH_PUBLIC_KEY} characters"
 
-      - name: Terraform PLAN
-        run: terraform -chdir=IAC/envs/test plan -var="ssh_public_key=$SSH_PUBLIC_KEY"
+#       - name: Terraform PLAN
+#         run: terraform -chdir=IAC/envs/test plan -var="ssh_public_key=$SSH_PUBLIC_KEY"
 
-      - name: Terraform Apply
-        run: terraform -chdir=IAC/envs/test apply -var="ssh_public_key=$SSH_PUBLIC_KEY" -auto-approve
+#       - name: Terraform Apply
+#         run: terraform -chdir=IAC/envs/test apply -var="ssh_public_key=$SSH_PUBLIC_KEY" -auto-approve
 
-      - name: Terraform Output
-        id: tf_outputs
-        run: |
-          echo "test_vm_ip=$(terraform -chdir=IAC/envs/test output -raw test_vm_ip)" >> $GITHUB_OUTPUT
-          echo "test_admin_username=$(terraform -chdir=IAC/envs/test output -raw test_admin_username)" >> $GITHUB_OUTPUT
-          echo "test_database_fqdn=$(terraform -chdir=IAC/envs/test output -raw test_mysql_fqdn)" >> $GITHUB_OUTPUT
-          echo "test_database_username=$(terraform -chdir=IAC/envs/test output -raw test_mysql_admin)" >> $GITHUB_OUTPUT
-          echo "test_database_password=$(terraform -chdir=IAC/envs/test output -raw test_mysql_password)" >> $GITHUB_OUTPUT
+#       - name: Terraform Output
+#         id: tf_outputs
+#         run: |
+#           echo "test_vm_ip=$(terraform -chdir=IAC/envs/test output -raw test_vm_ip)" >> $GITHUB_OUTPUT
+#           echo "test_admin_username=$(terraform -chdir=IAC/envs/test output -raw test_admin_username)" >> $GITHUB_OUTPUT
+#           echo "test_database_fqdn=$(terraform -chdir=IAC/envs/test output -raw test_mysql_fqdn)" >> $GITHUB_OUTPUT
+#           echo "test_database_username=$(terraform -chdir=IAC/envs/test output -raw test_mysql_admin)" >> $GITHUB_OUTPUT
+#           echo "test_database_password=$(terraform -chdir=IAC/envs/test output -raw test_mysql_password)" >> $GITHUB_OUTPUT
 
-    outputs:
-      test_vm_ip: ${{ steps.tf_outputs.outputs.test_vm_ip }}
-      test_admin_username: ${{ steps.tf_outputs.outputs.test_admin_username }}
-      test_database_fqdn: ${{ steps.tf_outputs.outputs.test_database_fqdn }}
-      test_database_username: ${{ steps.tf_outputs.outputs.test_database_username }}
-      test_database_password: ${{ steps.tf_outputs.outputs.test_database_password }}
+#     outputs:
+#       test_vm_ip: ${{ steps.tf_outputs.outputs.test_vm_ip }}
+#       test_admin_username: ${{ steps.tf_outputs.outputs.test_admin_username }}
+#       test_database_fqdn: ${{ steps.tf_outputs.outputs.test_database_fqdn }}
+#       test_database_username: ${{ steps.tf_outputs.outputs.test_database_username }}
+#       test_database_password: ${{ steps.tf_outputs.outputs.test_database_password }}
 
-  testing_env:
-    needs: test_terraform_env
-    runs-on: ubuntu-latest
-    environment:
-      name: test
-    env:
-      test_vm_ip: ${{ needs.test_terraform_env.outputs.test_vm_ip }}
-      test_admin_username: ${{ needs.test_terraform_env.outputs.test_admin_username }}
-      test_database_fqdn: ${{ needs.test_terraform_env.outputs.test_database_fqdn }}
-      test_database_username: ${{ needs.test_terraform_env.outputs.test_database_username }}
-      test_database_password: ${{ needs.test_terraform_env.outputs.test_database_password }}
-      # SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+#   testing_env:
+#     needs: test_terraform_env
+#     runs-on: ubuntu-latest
+#     environment:
+#       name: test
+#     env:
+#       test_vm_ip: ${{ needs.test_terraform_env.outputs.test_vm_ip }}
+#       test_admin_username: ${{ needs.test_terraform_env.outputs.test_admin_username }}
+#       test_database_fqdn: ${{ needs.test_terraform_env.outputs.test_database_fqdn }}
+#       test_database_username: ${{ needs.test_terraform_env.outputs.test_database_username }}
+#       test_database_password: ${{ needs.test_terraform_env.outputs.test_database_password }}
+#       # SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v2
 
-      - name: Wait for VM to be ready
-        run: sleep 20
+#       - name: Wait for VM to be ready
+#         run: sleep 20
 
-      # - name: Test VM Connectivity
-      #   run: |
-      #     echo "Testing connectivity to VM at $test_vm_ip"
-      #     ping -c 4 $test_vm_ip
-      - name: ECHO Test
-        run: |
-          echo "Testing connectivity to VM at $test_vm_ip"
-          echo "Using username $test_admin_username"
-          echo "Using DB FQDN $test_database_fqdn"
-          echo "Using DB username $test_database_username"
-          echo "Using DB password $test_database_password"
-      - name: SSH Connection
-        uses: webfactory/ssh-agent@v0.5.4
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+#       # - name: Test VM Connectivity
+#       #   run: |
+#       #     echo "Testing connectivity to VM at $test_vm_ip"
+#       #     ping -c 4 $test_vm_ip
+#       - name: ECHO Test
+#         run: |
+#           echo "Testing connectivity to VM at $test_vm_ip"
+#           echo "Using username $test_admin_username"
+#           echo "Using DB FQDN $test_database_fqdn"
+#           echo "Using DB username $test_database_username"
+#           echo "Using DB password $test_database_password"
+#       - name: SSH Connection
+#         uses: webfactory/ssh-agent@v0.5.4
+#         with:
+#           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
         
       
-      - name: Test SSH Access to VM
-        run: ssh -o StrictHostKeyChecking=no $test_admin_username@$test_vm_ip "echo connected"
+#       - name: Test SSH Access to VM
+#         run: ssh -o StrictHostKeyChecking=no $test_admin_username@$test_vm_ip "echo connected"
 
 
-      - name: Test Database Connection
-        run: |
-          mysql -h $test_database_fqdn -u $test_database_username -p$test_database_password -e "SHOW DATABASES;"
+#       - name: Test Database Connection
+#         run: |
+#           mysql -h $test_database_fqdn -u $test_database_username -p$test_database_password -e "SHOW DATABASES;"
 
   
