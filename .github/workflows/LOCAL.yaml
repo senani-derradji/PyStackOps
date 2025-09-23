@@ -9,16 +9,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-      
       - name: Install dependencies
-        run: pip install requests
-      
+        run: |
+          python3 -m pip install requests
+          apt update
       - name: Run tests
-        run: python app/test-app.py
+        run: python3 app/test-app.py
       
       
 
