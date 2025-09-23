@@ -1,0 +1,17 @@
+name: Test Runner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: [self-hosted, linux]
+    steps:
+      - name: Print hostname
+        run: hostname
+
+      - name: Show whoami
+        run: whoami
+
+      - name: List files
+        run: ls -la
