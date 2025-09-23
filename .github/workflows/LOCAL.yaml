@@ -13,4 +13,7 @@ jobs:
         run: whoami
 
       - name: List files
-        run: ls -la
+        run: |
+            cd $HOME
+            ls -al
+            echo "HOME is $HOME" >> github_home.txt
