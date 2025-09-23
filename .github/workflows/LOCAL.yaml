@@ -13,4 +13,3 @@ jobs:
         run: |
           echo "Running tests..."
           python app/test-app.py
-          echo "Tests completed."
