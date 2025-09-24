@@ -4,7 +4,7 @@ metadata:
   name: nginx-service
 spec:
   # type: NodePort # Just for testing with k3s internal load balancer
-  # type: LoadBalancer
+  type: LoadBalancer
   selector:
     app: nginx
   ports:
