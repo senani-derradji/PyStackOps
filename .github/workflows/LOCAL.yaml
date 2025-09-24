@@ -11,7 +11,7 @@ jobs:
       
       - name: Run K8s Manifests
         run : |
-          cd k8s/K3s
+          cd k8s/K3s/DEV-TEST
           sudo bash ./apply.sh
 
       
