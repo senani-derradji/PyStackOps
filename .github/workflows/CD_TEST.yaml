@@ -1,11 +1,11 @@
-# # name: CI_TEST
+# name: CI_TEST
 
-# # on:
-# #   workflow_run:
-# #     workflows: ["CI_DEV.yaml"]
+# on:
+#   workflow_run:
+#     workflows: ["CI_DEV.yaml"]
 
-# #     types:
-# #       - completed
+#     types:
+#       - completed
 
 # jobs:
 #   test_terraform_env:

@@ -1,20 +1,21 @@
-name: Test Runner
+# name: Test Runner
 
-on: [push]
+# on: [push]
 
-jobs:
-  test:
-    runs-on: [self-hosted, linux]
-    steps:
-      - name: test
-        run: |
-          echo "hello" >> t.txt
-          cat t.txt
-      # - name: Checkout code
-      #   uses: actions/checkout@v3
+# jobs:
+#   test:
+#     runs-on: [self-hosted, linux]
+#     steps:
+#       # - name: test
+#       #   run: |
+#       #     echo "hello world" >> test.txt
+#       #     cat test.txt
+#       - name: Checkout code
+#         uses: actions/checkout@v3
       
-      # - name: Run K8s Manifests
-      #   run : |
-      #     cd k8s/K3s/DEV-TEST
-      #     sudo bash ./apply.sh
+#         # Production Deployment
+#       - name: Run K8s Manifests Locally
+#         run : |
+#           cd k8s/K3s/DEV-TEST
+#           sudo bash ./apply.sh
           
