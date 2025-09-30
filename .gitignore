@@ -15,3 +15,8 @@ override.tf.json
 
 # Scripts/
 star.sh
+
+# Folders
+logs/
+tmp/
+.vscode/
