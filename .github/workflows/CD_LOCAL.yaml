@@ -8,8 +8,8 @@ jobs:
     steps:
       - name: test
         run: |
-          echo "hello world" >> test.txt
-          cat test.txt
+          echo "hello" >> t.txt
+          cat t.txt
       # - name: Checkout code
       #   uses: actions/checkout@v3
       
