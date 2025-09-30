@@ -20,3 +20,5 @@ star.sh
 logs/
 tmp/
 .vscode/
+__pycache__/
+*.pyc
