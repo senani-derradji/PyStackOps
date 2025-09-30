@@ -1,339 +1,300 @@
-# 🚀 PyStackOps (Flask/Gunicorn + MariaDB + Redis + Nginx)
-Production-ready Python backend with two deployment paths:
+# PyStackOps
 
-1) 🐳 **Docker Compose** — Nginx (reverse proxy + TLS) → Flask/Gunicorn; Flask → MariaDB & Redis  
-2) ☸️ **Kubernetes (Minikube)** — App + Redis + MariaDB, Observability (Prometheus + exporters + Grafana), **name‑based virtual hosts**
+A production-ready Python backend using Flask + Gunicorn, with deployment options via Docker Compose or Kubernetes (Minikube).  
+Includes observability (Prometheus + exporters + Grafana), Nginx reverse proxy, and support for a self-hosted GitHub Actions runner.  
+
+<p align="center">
+  <!-- Cloud & Infra -->
+  <img src="https://img.shields.io/badge/Azure-0078D4?style=for-the-badge&logo=microsoft-azure&logoColor=white" />
+  
+  <!-- IaC & Automation -->
+  <img src="https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white" />
+  <img src="https://img.shields.io/badge/Ansible-EE0000?style=for-the-badge&logo=ansible&logoColor=white" />
+  
+  <!-- Containers & Orchestration -->
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
+  <img src="https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white" />
+  <img src="https://img.shields.io/badge/DockerCompose-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
+  
+  <!-- CI/CD & Version Control -->
+  <img src="https://img.shields.io/badge/GitHubActions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white" />
+  <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white" />
+  
+  <!-- Monitoring & Observability -->
+  <img src="https://img.shields.io/badge/Grafana-F46800?style=for-the-badge&logo=grafana&logoColor=white" />
+  <img src="https://img.shields.io/badge/Prometheus-E6522C?style=for-the-badge&logo=prometheus&logoColor=white" />
+  
+  <!-- Web & Backend -->
+  <img src="https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white" />
+  <img src="https://img.shields.io/badge/Gunicorn-499848?style=for-the-badge&logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white" />
+  
+  <!-- Databases & Caching -->
+  <img src="https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white" />
+  <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white" />
+  
+  <!-- OS & Scripting -->
+  <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black" />
+  <img src="https://img.shields.io/badge/Bash-4EAA25?style=for-the-badge&logo=gnubash&logoColor=white" />
+</p>
+
 
 ---
 
 ## ✨ Features
 
-- ⚙️ **Flask** served by **Gunicorn**
-- 🗃️ **MariaDB** for persistent data (auth, messages, etc.)
-- ⚡ **Redis** for caching
-- 🌐 **Nginx** reverse proxy with **HTTPS** termination (Compose path)
-- 📊 **Prometheus** + **Exporters** (MySQL, Redis, Nginx)
-- 📈 **Grafana** dashboards
-- 🔐 `.env` for local secrets (Compose), **K8s Secrets** for cluster
-- 🧠 Login/Register flow with persistent user data
+- Flask application served by Gunicorn  
+- MariaDB for persistent data (auth, messaging, etc.)  
+- Redis as cache / session store  
+- Nginx reverse proxy + TLS termination  
+- Prometheus + exporters for MySQL, Redis, Nginx  
+- Grafana dashboards (optional)  
+- Deployment via Docker Compose or Kubernetes  
+- Self-hosted Actions runner integration  
 
 ---
 
-## 🧱 Repository Structure (Overview)
+## 📂 Repository Structure (Overview)
 
 ```
-Python-Dockerized-Backend/
-├─ app/
-│  ├─ app.py
-│  ├─ requirements.txt
-│  ├─ Dockerfile
-│  └─ templates/
-│     ├─ register.html
-│     └─ login.html
-│
-├─ nginx/
-│  ├─ nginx.conf
-│  └─ certs/
-│     ├─ fullchain.pem
-│     └─ privkey.pem
-│
-├─ prometheus/
-│  ├─ mysql-exporter/
-│  └─ prometheus.yml
-│
-├─ k8s/
-│  └─ Minikube/
-│     ├─ ConfigMaps/
-│     │  ├─ Nginx-ConfigMap.yaml
-│     │  ├─ mysql-exporter-configMap.yaml
-│     │  └─ prometheus-configMap.yaml
-│     ├─ Deployments/
-│     │  ├─ Exporters/
-│     │  │  ├─ mysql-exporter-Deployment.yaml
-│     │  │  ├─ nginx-exporter-Deployment.yaml
-│     │  │  └─ redis-exporter-Deployment.yaml
-│     │  ├─ Flask-Deployment.yaml
-│     │  ├─ Grafana-Deployment.yaml
-│     │  ├─ Mysql-Deployment.yaml
-│     │  ├─ Nginx-Deployment.yaml
-│     │  ├─ Prometheus-Deployment.yaml
-│     │  └─ Redis-Deployment.yaml
-│     ├─ Ingress/
-│     │  ├─ Monitoring-Ingress-Service.yaml
-│     │  └─ Nginx-Ingress-Service.yaml
-│     ├─ PVCs/
-│     │  └─ PVC.yaml
-│     ├─ Secrets/
-│     │  └─ Secrets.yaml
-│     └─ Services/
-│        ├─ Exporters/
-│        │  ├─ mysql-exporter-Service.yaml
-│        │  ├─ nginx-exporter-Service.yaml
-│        │  └─ redis-exporter-Service.yaml
-│        ├─ Flask-Service.yaml
-│        ├─ Grafana-Service.yaml
-│        ├─ Mysql-Service.yaml
-│        ├─ Nginx-Service.yaml
-│        ├─ Prometheus-Service.yaml
-│        └─ Redis-Service.yaml
-│
-├─ .env
-├─ docker-compose.yml
-├─ start.sh
-├─ .dockerignore
-├─ .gitignore
-└─ README.md
+PyStackOps/
+├─ .github/
+│   └─ workflows/           # CI / CD workflows
+├─ IAC/                     # Infrastructure-as-code  
+├─ app/                     # Flask app & templates  
+├─ k8s/                     # Kubernetes manifests  
+├─ nginx/                   # Reverse proxy + TLS configs  
+├─ prometheus/              # Exporters & config  
+├─ local_pipeline/          # Ansible playbooks / runner script  
+├─ Dockerfile  
+├─ docker-compose.yml  
+├─ runner.sh                 # script to register runner  
+├─ hosts.ini                 # Ansible inventory  
+├─ playbook.yaml             # Playbook for runner setup  
+└─ README.md  
 ```
 
 ---
+## 📝 Extended Information
 
-## #1 Architecture — Docker Compose
+### 🔬 Purpose & Scope
+PyStackOps is designed as a **full-stack DevOps-ready project** combining backend development, containerization, infrastructure automation, and observability. It provides a **ready-to-use production stack** for Python applications with enterprise-grade features such as:
 
-```
- +------------+
- |   Client   |
- +------------+
-       |
- HTTPS | 443 (TLS)
-       v
-+-------------+        HTTP 5000
-|   Nginx     | ─────────────────► +-------------+
-|  (TLS RP)   |                    |  Flask App  |
-+-------------+                    | (Gunicorn)  |
-                                   +-------------+
-                                          | 
-                                          |   
-                                          v 
-+-------------+                     +-------------+
-|  MariaDB    |  ◄──────────────►   |   Redis     |
-+-------------+                     +-------------+
-           (Flask connects to MariaDB and Redis)
-```
-
-- TLS termination via `nginx/certs/{fullchain.pem,privkey.pem}`
-- Reverse proxy & caching in `nginx/nginx.conf`
+- Automated CI/CD with **self-hosted GitHub Actions runners**.  
+- Modular infrastructure provisioning via **Terraform**, enabling deployment on Azure and extensible to other cloud providers.  
+- Flexible deployment: **local development with Docker Compose** or **production-grade Kubernetes clusters**.  
+- Built-in **monitoring & observability**, including metrics for databases, cache, web server, and application performance.
 
 ---
 
-## #2 Architecture — Kubernetes (Minikube, name‑based vhosts)
+### ⚙️ Key Technologies
 
-```
-                 Ingress (Nginx Ingress Controller)
-                 ├───────────── derradji.local  ───────────► App (Nginx → Flask)
-                 ├───────────── grafana.local   ───────────► Grafana
-                 └───────────── prometheus.local ──────────► Prometheus
-
-      +-----------+      +---------+      +---------+
-      |  Flask    | ◄──► | MariaDB | ◄──► |  Redis  |
-      +-----------+      +---------+      +---------+
-
-(Services, ConfigMaps, Deployments, Secrets, PVCs under k8s/Minikube/)
-```
-
-- **Ingress rules (host-based)**
-  - `derradji.local` → application (Nginx/Flask)
-  - `grafana.local` → Grafana
-  - `prometheus.local` → Prometheus
-  - You can change these in `k8s/Minikube/Ingress/Nginx-Ingress-Service.yaml` and `Monitoring-Ingress-Service.yaml`.
-
-- **Exporters**: MySQL, Redis, Nginx exporters scraped by Prometheus
-- **PVCs**: Persistent volumes for DB and (optionally) Prometheus/Grafana
-- **Secrets**: App/DB credentials in `Secrets/Secrets.yaml` (base64-encoded)
+| Layer | Technology |
+|-------|------------|
+| Backend | Python 3.11, Flask, Gunicorn |
+| Database | MariaDB, Redis |
+| Web Server | Nginx (TLS + reverse proxy) |
+| CI/CD | GitHub Actions (self-hosted runner) |
+| Containerization | Docker, Docker Compose |
+| Orchestration | Kubernetes (Minikube, Kind, AKS) |
+| IaC | Terraform (modular envs & modules) |
+| Configuration Management | Ansible |
+| Monitoring & Observability | Prometheus, Grafana, MySQL/Redis/Nginx exporters |
+| Testing & QA | Pytest, Semgrep (optional) |
 
 ---
 
-## 🔐 Environment Variables (.env) — Compose
+### 🌟 Highlights
 
-Create a `.env` in the repo root:
+- **Production-ready stack**: PyStackOps is immediately deployable for testing and production scenarios.  
+- **Modular & scalable design**: Infrastructure and application modules are designed for scaling horizontally and integrating additional services.  
+- **CI/CD workflows included**: Automated pipelines for development, testing, and deployment across multiple environments.  
+- **Observability built-in**: Collect metrics, logs, and alerts to monitor app health and performance.  
+- **Multi-environment support**: Dev, test, and prod configurations for easy environment isolation.  
+- **Extensible**: Can integrate additional services like Vault, Helm charts, or cloud providers (AWS/GCP).  
 
-```
-# Database settings
+---
+
+### 📈 Benefits
+
+- Rapid deployment of Python backend services with full DevOps tooling.  
+- Simplifies infrastructure management with reusable Terraform modules.  
+- Ensures high availability and reliability with container orchestration and monitoring.  
+- Provides a learning playground for DevOps, Python backend, Kubernetes, and CI/CD practices.  
+
+---
+## 🔧 Setup & Deployment
+
+### Setup environment variables
+
+Create a `.env` in the project root (for Docker Compose mode):
+
+```bash
+# Database
 DB_HOST=db
 DB_NAME=mydatabase
 DB_USER=myuser
 DB_PASSWORD=securepassword
 
 # Flask
-FLASK_SECRET_KEY=change_me
+FLASK_SECRET_KEY=your_secret_key
 
 # Redis
 REDIS_HOST=redis
 REDIS_PORT=6379
 ```
 
-> For Kubernetes, these values are provided via **K8s Secrets** (`k8s/Minikube/Secrets/Secrets.yaml`). Don’t commit real secrets.
+> **Security note**: Do **not** commit `.env` with secrets. Use Kubernetes Secrets or a secrets manager in production.
 
 ---
 
-## 🐳 How to Run — Docker Compose
+### Run via Docker Compose
 
 ```bash
-# 1) Clone
-git clone https://github.com/senani-derradji/Python-Dockerized-Backend.git
-cd Python-Dockerized-Backend
-
-# 2) Ensure .env exists (see above) and TLS certs are in nginx/certs/
-#    fullchain.pem and privkey.pem (use your real certs or mkcert/self-signed)
-
-# 3) Build & run
 docker-compose up --build
-# or in background:
-# docker-compose up -d --build
 ```
 
-Open the app: **https://derradji.com** (or the host configured in your Nginx cert).  
-Optional: Portainer (if enabled in compose) at `http://localhost:9000`.
-
-**Quick test**
-```
-wrk -t4 -c100 -d30s https://derradji.com
-```
+Then visit your app via the configured host (e.g. `https://your-domain.com`) with TLS.
 
 ---
 
-## ☸️ How to Run — Kubernetes (Minikube)
+### Run via Kubernetes (Minikube)
 
-### Prereqs
-- Minikube, kubectl
-- Nginx Ingress Controller enabled in Minikube
-
-### One‑shot apply
-Use the helper script to apply **everything** (Secrets, ConfigMaps, PVCs, Deployments, Services, Exporters, Ingresses):
-```bash
-./start.sh
-```
-
-> The script mirrors manual steps below. Inspect/edit it before running in your environment.
-
-### Manual steps (if you prefer)
 ```bash
 minikube start
 minikube addons enable ingress
 
-# 1) Secrets
-kubectl apply -f k8s/Minikube/Secrets/Secrets.yaml
-
-# 2) ConfigMaps
-kubectl apply -f k8s/Minikube/ConfigMaps/
-
-# 3) PVCs
-kubectl apply -f k8s/Minikube/PVCs/PVC.yaml
-
-# 4) Core Services & Deployments
-kubectl apply -f k8s/Minikube/Deployments/Mysql-Deployment.yaml
-kubectl apply -f k8s/Minikube/Services/Mysql-Service.yaml
-
-kubectl apply -f k8s/Minikube/Deployments/Redis-Deployment.yaml
-kubectl apply -f k8s/Minikube/Services/Redis-Service.yaml
-
-kubectl apply -f k8s/Minikube/Deployments/Flask-Deployment.yaml
-kubectl apply -f k8s/Minikube/Services/Flask-Service.yaml
-
-kubectl apply -f k8s/Minikube/Deployments/Nginx-Deployment.yaml
-kubectl apply -f k8s/Minikube/Services/Nginx-Service.yaml
-
-# 5) Observability
-kubectl apply -f k8s/Minikube/Deployments/Prometheus-Deployment.yaml
-kubectl apply -f k8s/Minikube/Services/Prometheus-Service.yaml
-
-kubectl apply -f k8s/Minikube/Deployments/Grafana-Deployment.yaml
-kubectl apply -f k8s/Minikube/Services/Grafana-Service.yaml
-
-# 6) Exporters
-kubectl apply -f k8s/Minikube/Deployments/Exporters/
-kubectl apply -f k8s/Minikube/Services/Exporters/
-
-# 7) Ingress (host-based)
-kubectl apply -f k8s/Minikube/Ingress/Nginx-Ingress-Service.yaml
-kubectl apply -f k8s/Minikube/Ingress/Monitoring-Ingress-Service.yaml
+# Apply resources
+./start.sh
 ```
 
-### /etc/hosts entries (host‑based vhosts)
-Get the Minikube IP:
+Add host entries in `/etc/hosts` to map domain names (`derradji.local`, `grafana.local`, `prometheus.local`) to Minikube IP.
+
+---
+
+## 🏃 Self-Hosted GitHub Actions Runner
+
+You can run a GitHub Actions runner on your VM to execute workflows locally or on your infra.
+
+### 1. Generate a Personal Access Token (PAT)
+
+1. Go to **GitHub → Settings → Developer settings**  
+2. Click **Fine-grained tokens → Generate new token**  
+3. Set:
+   - Name (e.g. `runner-token-PyStackOps`)  
+   - Expiration  
+   - Repository access: select **PyStackOps**  
+   - Permissions → **Actions: Read & write**  
+4. Generate and **copy** the token (you’ll see it only once)
+
+### 2. Register the Runner
+
 ```bash
-minikube ip
-# e.g. 192.168.49.2
-```
-Add to your host machine’s `/etc/hosts`:
-```
-192.168.49.2 derradji.local
-192.168.49.2 grafana.local
-192.168.49.2 prometheus.local
+OWNER="senani-derradji"
+REPO="PyStackOps"
+PAT="your_token_here"
+
+response=$(curl -s \
+  -X POST \
+  -H "Authorization: Bearer $PAT" \
+  -H "Accept: application/vnd.github+json" \
+  "https://api.github.com/repos/$OWNER/$REPO/actions/runners/registration-token")
+
+token=$(echo "$response" | jq -r .token)
+
+cd ~/actions-runner
+./config.sh --unattended --url https://github.com/$OWNER/$REPO --token $token
+./svc.sh install
+./svc.sh start
 ```
 
-> You can change these hostnames in `Repo/k8s/Minikube/Ingress/Nginx-Ingress-Service.yaml` (for app) and the monitoring ingress file for Grafana/Prometheus.
+You can automate this via `runner.sh` or via the provided Ansible playbook.
 
-### Access
-- App: `http://derradji.local`
-- Grafana: `http://grafana.local`
-- Prometheus: `http://prometheus.local`
+---
 
-**Alternative (no Ingress):**
+## ✅ Quick Test Workflow
+
+Add a GitHub Actions workflow file (e.g. `.github/workflows/test-runner.yml`):
+
+```yaml
+name: Test Runner
+on: [push]
+jobs:
+  run-on-self-hosted:
+    runs-on: self-hosted
+    steps:
+      - name: Echo message
+        run: echo "Running on my self-hosted runner!"
+```
+
+Push a commit — the job should pick your runner.
+
+---
+
+## 📊 Monitoring & Observability
+
+- **Prometheus** is preconfigured in `prometheus/prometheus.yml`  
+- **Exporters included:**
+  - MySQL exporter
+  - Redis exporter
+  - Nginx metrics  
+- **Grafana** can be enabled for dashboards (see `prometheus/` and `grafana/` configs)
+
+Start Prometheus locally:
+
 ```bash
-kubectl port-forward svc/flask-service 5000:5000
-kubectl port-forward svc/prometheus-service 9090:9090
-kubectl port-forward svc/grafana-service 3000:3000
+docker-compose -f prometheus/docker-compose.yml up -d
+```
+
+Access at: [http://localhost:9090](http://localhost:9090)  
+Grafana (if enabled): [http://localhost:3000](http://localhost:3000)
+
+---
+
+## ☁️ Infrastructure as Code (Terraform)
+
+Infrastructure is provisioned via Terraform under `IAC/`.
+
+- Modular design with `envs/` (dev, test, prod) and `modules/`
+- Azure resources supported:
+  - Virtual Networks, Subnets, NSGs
+  - AKS (Kubernetes Service)
+  - ACR (Azure Container Registry)
+  - Virtual Machines
+
+Run example:
+
+```bash
+cd IAC/envs/dev
+terraform init
+terraform apply
 ```
 
 ---
 
-## 📦 Prometheus Scraping
+## 🗺️ Roadmap
 
-- Base config: `prometheus/prometheus.yml` (Compose) or `k8s/Minikube/ConfigMaps/prometheus-configMap.yaml` (K8s)
-- Targets:
-  - `mysql-exporter` — DB metrics
-  - `redis-exporter` — Redis metrics
-  - `nginx-exporter` — Nginx metrics
-  - (Optional) Flask app metrics if exposed
-
----
-
-## 🔑 Auth & App Notes
-
-- Register/Login flow persists users in MariaDB
-- Sessions secured via `FLASK_SECRET_KEY` (Compose) or K8s Secret
-- Redis used as a cache layer
+- [ ] Add Grafana dashboards as code  
+- [ ] Integrate HashiCorp Vault for secret management  
+- [ ] Expand Terraform modules for AWS / GCP  
+- [ ] Add Helm charts for Kubernetes deployments  
+- [ ] Enhance CI/CD with dynamic preview environments  
 
 ---
 
-## 🧰 Portainer (Compose Only — Optional)
+## 🛠 Troubleshooting & Tips
 
-If enabled in `docker-compose.yml`, Portainer is available at:
-```
-http://localhost:9000
-```
-
----
-
-## 🧪 Quick Functional Test
-
-1. Open the app (Compose: your domain with TLS; K8s: `http://derradji.local`)
-2. Register/Login
-3. Submit a message — it should persist in MariaDB
-4. Open `http://prometheus.local` and confirm targets are **UP**
-5. Open `http://grafana.local` and add/import dashboards for MySQL/Redis/Nginx
+- If `config.sh` says “already configured”, run `./svc.sh uninstall` or `./config.sh remove` before re-running setup  
+- Use **absolute paths** (don’t rely on `~`) in scripts  
+- Manage PAT securely with **Ansible Vault** or environment variables  
+- For production, rotate your PAT often  
+- Check `systemctl status actions.runner.*` to debug the runner service  
 
 ---
 
-## 🛠️ Common Troubleshooting
+## 📄 About
 
-- **Ingress 404/loops**: Confirm hostnames in `/etc/hosts` map to *current* `minikube ip`. Clear site data for `*.local` domains after changes.
-- **DB connection**: Verify Secrets/Env, Service names (`db` in Compose, `mysql-service` in K8s), and that the pod is Ready.
-- **PVC pending**: Ensure Minikube has a default StorageClass (it does by default) and that `PVC.yaml` matches it.
-- **Exporters down**: Check Service selectors/labels and that Prometheus job labels match service names.
+PyStackOps is built by **senani-derradji**.  
+It supports modern DevOps flows with self-hosted CI, full observability, and flexible deployment.
 
----
-
-## 📜 Scripts
-
-- `start.sh` — applies **everything** (Secrets, ConfigMaps, PVCs, Deployments, Services, Exporters, Ingresses).
-
----
-
-## 🔒 Security Notes
-
-- Never commit real TLS keys or production secrets.
-- For K8s, prefer an external secret manager or sealed secrets for production.
-- For public ingress/TLS on real clusters, consider `cert-manager` with Let’s Encrypt.
-
----
+![Animated GIF](https://s5.ezgif.com/tmp/ezgif-5d2c7121e6a2b9.gif)
